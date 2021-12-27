@@ -9,8 +9,10 @@ import org.springframework.context.ApplicationContextInitializer;
  * @since 2020/10/14 20:08
  */
 public class MyApplicationContextInitializer implements ApplicationContextInitializer<MyXmlWebAppContext> {
+
 	@Override
 	public void initialize(MyXmlWebAppContext applicationContext) {
 		System.out.println(getClass() + "applicationContext = " + applicationContext);
 	}
+
 }

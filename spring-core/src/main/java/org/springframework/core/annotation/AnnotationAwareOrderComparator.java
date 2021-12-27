@@ -16,14 +16,14 @@
 
 package org.springframework.core.annotation;
 
+import org.springframework.core.DecoratingProxy;
+import org.springframework.core.OrderComparator;
+import org.springframework.lang.Nullable;
+
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-
-import org.springframework.core.DecoratingProxy;
-import org.springframework.core.OrderComparator;
-import org.springframework.lang.Nullable;
 
 /**
  * {@code AnnotationAwareOrderComparator} is an extension of
@@ -43,6 +43,8 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.core.Ordered
  * @see org.springframework.core.annotation.Order
  * @see javax.annotation.Priority
+ * 注解形式 IoC 的默认 comparator
+ * {@link org.springframework.context.annotation.AnnotationConfigUtils#registerAnnotationConfigProcessors(org.springframework.beans.factory.support.BeanDefinitionRegistry, java.lang.Object)}
  */
 public class AnnotationAwareOrderComparator extends OrderComparator {
 

@@ -1,3 +1,5 @@
+!spring-aop/src/main/
+
 *.java.hsp
 *.sonarj
 *.sw*

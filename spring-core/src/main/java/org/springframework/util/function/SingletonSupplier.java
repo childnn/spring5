@@ -16,10 +16,10 @@
 
 package org.springframework.util.function;
 
-import java.util.function.Supplier;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.function.Supplier;
 
 /**
  * A {@link java.util.function.Supplier} decorator that caches a singleton result and
@@ -42,6 +42,7 @@ public class SingletonSupplier<T> implements Supplier<T> {
 	@Nullable
 	private final Supplier<? extends T> defaultSupplier;
 
+	// volatile
 	@Nullable
 	private volatile T singletonInstance;
 
@@ -89,6 +90,7 @@ public class SingletonSupplier<T> implements Supplier<T> {
 	@Nullable
 	public T get() {
 		T instance = this.singletonInstance;
+		// double check lock
 		if (instance == null) {
 			synchronized (this) {
 				instance = this.singletonInstance;

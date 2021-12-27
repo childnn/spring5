@@ -16,8 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -25,6 +23,8 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.util.function.Supplier;
 
 /**
  * Standalone application context, accepting <em>component classes</em> as input &mdash;
@@ -53,16 +53,32 @@ import org.springframework.util.Assert;
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
-	private final AnnotatedBeanDefinitionReader reader;
+	/**
+	 * 可以认为这里的 Reader 和 Scanner 具有相同的功能.
+	 * Reader 是 register 一个/多个 配置类
+	 * Scanner 是扫描给定的包(base packages)
+	 * @see org.springframework.context.annotation.AnnotatedBeanDefinitionReader#register(Class[])
+	 * @see org.springframework.context.annotation.ClassPathBeanDefinitionScanner#scan(String...)
+	 * 这两个值是默认的, 无法自行设置.
+	 */
+	private final AnnotatedBeanDefinitionReader reader; // read the config class annotated with @Configuration.
 
-	private final ClassPathBeanDefinitionScanner scanner;
+	private final ClassPathBeanDefinitionScanner scanner; // scanner the package.
 
 
 	/**
 	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
+	 * @see #getEnvironment()
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 此处会调用父类的构造方法: 构建 bean factory --- 此即所谓 IoC 容器
+		super(); // 这一行源码没有, 会默认调用的, 这里是方便调试加的
+		// public GenericApplicationContext() {
+		// 		this.beanFactory = new DefaultListableBeanFactory();
+		// 	}
+		// 初始化 reader/scanner, 并 getOrCreateEnvironment.
+		// 实际就是调用 #
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
@@ -84,9 +100,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
-		this();
-		register(componentClasses);
-		refresh();
+		this(); // 构建 IoC-container, reader, scanner
+		register(componentClasses); // 注册主配置类: reader.register(..)
+		refresh(); // 核心方法: 父类
 	}
 
 	/**
@@ -97,7 +113,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
-		scan(basePackages);
+		scan(basePackages); // 包扫描: scanner.scan(...)
 		refresh();
 	}
 

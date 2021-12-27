@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//log4j/log4j Configuration//EN" "log4j.dtd">
+<log4j:configuration>
+	<!-- appender: 日志输出位置 -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<!--<errorHandler class="">
+			<param name="" value=""/>
+			<root-ref/>
+			<logger-ref ref=""/>
+			<appender-ref ref=""/>
+		</errorHandler>-->
+		<!--<param name="" value=""/>
+		<rollingPolicy class="" name="">
+			<param name="" value=""/>
+			<param name="" value=""/>
+		</rollingPolicy>
+		<triggeringPolicy class="" name="">
+			<param name="" value=""/>
+			<filter class="">
+				<param name="" value=""/>
+			</filter>
+		</triggeringPolicy>-->
+		<!--<connectionSource class="">
+			<dataSource class="">
+				<param name="" value=""/>
+			</dataSource>
+			<param name="" value=""/>
+		</connectionSource>-->
+		<!--
+		 ConsoleAppender-target: 表示输出目的地
+		 可以是 System.out: 标准输出设备(缓冲显示屏)
+			   System.err: 标准错误输出(不缓冲显示屏)
+		-->
+		<param name="target" value="System.out"/>
+		<!-- 日志输出格式 -->
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- org.apache.log4j.PatternLayout.setConversionPattern
+			[%d{yyyy-MM-dd HH:mm:ss SSS}] [%t]
+			-->
+			<param name="conversionPattern" value="%-100.60l - %m%n"/>
+			<!--<param name="conversionPattern" value="[%p][%40.40c]-[%m]%n"/>-->
+		</layout>
+		<!-- 过滤器设置日志输出级别 -->
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ALL"/>
+			<param name="levelMax" value="FATAL"/>
+		</filter>
+		<!--<appender-ref ref=""/>-->
+	</appender>
+
+		<root>
+			<level value="TRACE"/>
+			<appender-ref ref="console"/>
+		</root>
+</log4j:configuration>

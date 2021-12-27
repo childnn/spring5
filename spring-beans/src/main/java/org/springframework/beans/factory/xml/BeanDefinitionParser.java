@@ -35,6 +35,7 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  * @see NamespaceHandler
  * @see AbstractBeanDefinitionParser
+ * xml 标签对应的 parser, 会在 {@link NamespaceHandler#init()} 注册到 handler 中
  */
 public interface BeanDefinitionParser {
 

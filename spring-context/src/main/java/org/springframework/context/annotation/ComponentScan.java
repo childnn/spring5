@@ -16,16 +16,17 @@
 
 package org.springframework.context.annotation;
 
+import org.springframework.beans.factory.support.BeanNameGenerator;
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.type.filter.TypeFilter;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.springframework.beans.factory.support.BeanNameGenerator;
-import org.springframework.core.annotation.AliasFor;
-import org.springframework.core.type.filter.TypeFilter;
 
 /**
  * Configures component scanning directives for use with @{@link Configuration} classes.
@@ -51,6 +52,9 @@ import org.springframework.core.type.filter.TypeFilter;
  * @author Sam Brannen
  * @since 3.1
  * @see Configuration
+ * @see ComponentScanAnnotationParser#parse(org.springframework.core.annotation.AnnotationAttributes, java.lang.String)
+ * @see ClassPathScanningCandidateComponentProvider#addIncludeFilter(org.springframework.core.type.filter.TypeFilter)
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -134,6 +138,9 @@ public @interface ComponentScan {
 	 * even if it does not match the default filters (i.e. is not annotated with {@code @Component}).
 	 * @see #resourcePattern()
 	 * @see #useDefaultFilters()
+	 * @see ComponentScanAnnotationParser#parse(org.springframework.core.annotation.AnnotationAttributes, java.lang.String)
+	 * 这里点 Ctrl 是搜不到源码里对此属性的访问的, Spring 将注解转为 {@link AnnotationAttributes}
+	 * 再通过其方法 {@link AnnotationAttributes#getAnnotationArray(java.lang.String)} 获取属性值
 	 */
 	Filter[] includeFilters() default {};
 

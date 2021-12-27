@@ -25,6 +25,9 @@ package org.springframework.context.annotation;
  * @see org.springframework.scheduling.annotation.EnableAsync#mode()
  * @see org.springframework.scheduling.annotation.AsyncConfigurationSelector#selectImports
  * @see org.springframework.transaction.annotation.EnableTransactionManagement#mode()
+ * 代理方式
+ * @see AdviceModeImportSelector
+ * @see org.springframework.cache.annotation.CachingConfigurationSelector
  */
 public enum AdviceMode {
 

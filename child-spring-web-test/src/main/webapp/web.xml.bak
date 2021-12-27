@@ -1,3 +1,4 @@
+<!--
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -5,7 +6,7 @@
                   http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
 		 version="4.0">
 
-	<!-- 入口 -->
+	&lt;!&ndash; 入口 &ndash;&gt;
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
@@ -25,11 +26,11 @@
 	<servlet>
 		<servlet-name>dispatcherServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<!--<init-param>
+		&lt;!&ndash;<init-param>
 			<param-name>1</param-name>
 			<param-value>2</param-value>
-		</init-param>-->
-<!--		<load-on-startup>1</load-on-startup>-->
+		</init-param>&ndash;&gt;
+&lt;!&ndash;		<load-on-startup>1</load-on-startup>&ndash;&gt;
 	</servlet>
 
 	<servlet-mapping>
@@ -37,4 +38,4 @@
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-</web-app>
+</web-app>-->

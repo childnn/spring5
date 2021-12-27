@@ -48,6 +48,9 @@ import java.lang.annotation.Target;
  * @see Configuration
  * @see ImportSelector
  * @see ImportResource
+ * 1. 引入其他 {@link Configuration} 配置类
+ * 2. 引入 {@link ImportSelector}
+ * 3. 引入 {@link ImportBeanDefinitionRegistrar}
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

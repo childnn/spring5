@@ -7,8 +7,11 @@
 
 	<aop:config>
 		<aop:aspect id="annotationBindingAspect" ref="testAspect">
-			<aop:around pointcut="@annotation(testAnnotation)" method="doWithAnnotation"/>
+			<!-- 切入点: 执行标注有 @TestAnnotation 的方法实际上就是执行 doWithAnnotation 方法 -->
+			<!-- 这里的形参名必须一样? 暂时不清楚原理 -->
+			<aop:around pointcut="@annotation(t)" method="doWithAnnotation"/>
 		</aop:aspect>
+		<!--<aop:pointcut id="" expression=""/>-->
 	</aop:config>
 
 	<bean id="testAspect" class="org.springframework.aop.aspectj.autoproxy.AnnotationBindingTestAspect"/>

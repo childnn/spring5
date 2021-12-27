@@ -16,22 +16,21 @@
 
 package org.springframework.core.env;
 
-import java.security.AccessControlException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.SpringProperties;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.security.AccessControlException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract base class for {@link Environment} implementations. Supports the notion of
@@ -462,18 +461,20 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		String[] parentActiveProfiles = parent.getActiveProfiles();
 		if (!ObjectUtils.isEmpty(parentActiveProfiles)) {
 			synchronized (this.activeProfiles) {
-				for (String profile : parentActiveProfiles) {
-					this.activeProfiles.add(profile);
-				}
+				// for (String profile : parentActiveProfiles) {
+				// 		this.activeProfiles.add(profile);
+				// }
+				Collections.addAll(this.activeProfiles, parentActiveProfiles);
 			}
 		}
 		String[] parentDefaultProfiles = parent.getDefaultProfiles();
 		if (!ObjectUtils.isEmpty(parentDefaultProfiles)) {
 			synchronized (this.defaultProfiles) {
 				this.defaultProfiles.remove(RESERVED_DEFAULT_PROFILE_NAME);
-				for (String profile : parentDefaultProfiles) {
-					this.defaultProfiles.add(profile);
-				}
+				// for (String profile : parentDefaultProfiles) {
+				// 		this.defaultProfiles.add(profile);
+				// }
+				Collections.addAll(this.defaultProfiles, parentDefaultProfiles);
 			}
 		}
 	}

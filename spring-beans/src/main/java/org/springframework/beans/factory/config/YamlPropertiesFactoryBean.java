@@ -16,12 +16,12 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Properties;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.CollectionFactory;
 import org.springframework.lang.Nullable;
+
+import java.util.Properties;
 
 /**
  * Factory for {@link java.util.Properties} that reads from a YAML source,
@@ -80,6 +80,8 @@ import org.springframework.lang.Nullable;
  * @author Stephane Nicoll
  * @author Juergen Hoeller
  * @since 4.1
+ * 解析 Yaml 为 Properties
+ * @see YamlMapFactoryBean
  */
 public class YamlPropertiesFactoryBean extends YamlProcessor implements FactoryBean<Properties>, InitializingBean {
 

@@ -16,10 +16,6 @@
 
 package org.springframework.context.support;
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -33,6 +29,10 @@ import org.springframework.context.MessageSourceAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringValueResolver;
+
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor}
@@ -57,6 +57,9 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.context.MessageSourceAware
  * @see org.springframework.context.ApplicationContextAware
  * @see org.springframework.context.support.AbstractApplicationContext#refresh()
+ *
+ * 处理各种 {@link org.springframework.beans.factory.Aware} 接口的实现,
+ * 这些 aware 本身都是 context 模块中的 aware.
  */
 class ApplicationContextAwareProcessor implements BeanPostProcessor {
 

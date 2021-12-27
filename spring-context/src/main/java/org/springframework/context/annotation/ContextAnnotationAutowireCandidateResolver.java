@@ -16,14 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -34,6 +26,14 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Complete implementation of the
@@ -64,9 +64,10 @@ public class ContextAnnotationAutowireCandidateResolver extends QualifierAnnotat
 			Method method = methodParam.getMethod();
 			if (method == null || void.class == method.getReturnType()) {
 				Lazy lazy = AnnotationUtils.getAnnotation(methodParam.getAnnotatedElement(), Lazy.class);
-				if (lazy != null && lazy.value()) {
-					return true;
-				}
+				// if (lazy != null && lazy.value()) {
+				// 	   return true;
+				// }
+				return lazy != null && lazy.value();
 			}
 		}
 		return false;

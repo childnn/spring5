@@ -16,12 +16,12 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Factory for a {@code Map} that reads from a YAML source, preserving the
@@ -69,6 +69,7 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author Juergen Hoeller
  * @since 4.1
+ * @see YamlPropertiesFactoryBean
  */
 public class YamlMapFactoryBean extends YamlProcessor implements FactoryBean<Map<String, Object>>, InitializingBean {
 

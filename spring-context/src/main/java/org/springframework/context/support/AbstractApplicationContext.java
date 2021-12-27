@@ -132,7 +132,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** Logger used by this class. Available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	/** Unique id for this context, if any. */
+	/**
+	 * Unique id for this context, if any.
+	 * 所谓 identity hashcode 是指无视对应 class 对 {@link #hashCode()} 方法的 @Override
+	 * 无条件返回默认的 {@link Object#hashCode()} 值. 这里的 id 是 class name + 十六进制 hashcode
+	 * */
 	private String id = ObjectUtils.identityToString(this);
 
 	/** Display name. */
@@ -196,6 +200,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Create a new AbstractApplicationContext with no parent.
 	 */
 	public AbstractApplicationContext() {
+		super();
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
 
@@ -461,6 +466,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Return the list of BeanFactoryPostProcessors that will get applied
 	 * to the internal BeanFactory.
+	 * @see #addBeanFactoryPostProcessor(org.springframework.beans.factory.config.BeanFactoryPostProcessor)
 	 */
 	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
 		return this.beanFactoryPostProcessors;
@@ -485,11 +491,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
+			// 环境准备
 			// Prepare this context for refreshing.
 			prepareRefresh();
 
 			// org.springframework.context.support.GenericApplicationContext.GenericApplicationContext()
 			// 默认的 bean factory: org.springframework.beans.factory.support.DefaultListableBeanFactory.DefaultListableBeanFactory()
+			// SpringWeb 时会走到: org.springframework.context.support.AbstractRefreshableApplicationContext.refreshBeanFactory
 			// Tell the subclass to refresh the internal bean factory.
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -497,12 +505,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareBeanFactory(beanFactory);
 
 			try {
+				// 配置 BeanFactory: 子类实现
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory); // empty method.
 
+				// 这个是 BeanFactory 层面的后置处理器: 调用
+				// BeanFactoryPostProcessor 在 Spring 中没有默认存在的, 都是根据需要添加:
+				// org.springframework.context.support.AbstractApplicationContext#addBeanFactoryPostProcessor
+				//
 				// Invoke factory processors registered as beans in the context.
 				invokeBeanFactoryPostProcessors(beanFactory);
 
+				// 这个 Bean 层面的后置处理器: 注册
 				// Register bean processors that intercept bean creation.
 				registerBeanPostProcessors(beanFactory);
 
@@ -519,7 +533,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				finishBeanFactoryInitialization(beanFactory);
+				finishBeanFactoryInitialization(beanFactory); // aspect-AOP
 
 				// Last step: publish corresponding event.
 				finishRefresh();
@@ -568,8 +582,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 
+		// 默认空实现, 子类实现, 目前是 web 环境的子类实现
 		// Initialize any placeholder property sources in the context environment.
 		initPropertySources();
+
+		// 如果是 spring 非 web 环境, environment 在 AnnotationConfigApplicationContext 的
+		// reader/scanner 初始化时调用 getOrCreateEnvironment 方法生成, 在此方法中, 满足条件
+		// 		// GenericApplicationContext implements BeanDefinitionRegistry, ApplicationContext extends EnvironmentCapable
+		//		if (registry instanceof EnvironmentCapable) {
+		// 			return ((EnvironmentCapable) registry).getEnvironment(); // 这里调用的就是当前类的 getEnvironment 方法
+		// 		}
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
@@ -604,6 +626,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @return the fresh BeanFactory instance
 	 * @see #refreshBeanFactory()
 	 * @see #getBeanFactory()
+	 * @see AbstractRefreshableApplicationContext#refreshBeanFactory() SpringWeb
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		refreshBeanFactory();
@@ -614,13 +637,23 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Configure the factory's standard context characteristics,
 	 * such as the context's ClassLoader and post-processors.
 	 * @param beanFactory the BeanFactory to configure
+	 * --
+	 * ignore dependency interfaces: *Aware
+	 * @see EnvironmentAware
+	 * @see EmbeddedValueResolverAware
+	 * @see ResourceLoaderAware
+	 * @see ApplicationEventPublisherAware
+	 * @see MessageSourceAware
+	 * @see ApplicationContextAware
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
 		beanFactory.setBeanClassLoader(getClassLoader());
+		// 启用 SpEL 解析
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
+		// bean post processor: 处理各种 Aware 接口的方法
 		// Configure the bean factory with context callbacks.
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
@@ -673,6 +706,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before singleton instantiation.
+	 * @see #addBeanFactoryPostProcessor(org.springframework.beans.factory.config.BeanFactoryPostProcessor)
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
@@ -847,7 +881,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
-		beanFactory.preInstantiateSingletons();
+		beanFactory.preInstantiateSingletons(); // aop
 	}
 
 	/**

@@ -13,7 +13,7 @@ public class MyXmlWebAppContext extends XmlWebApplicationContext {
 	@Override
 	protected void initBeanDefinitionReader(XmlBeanDefinitionReader beanDefinitionReader) {
 		super.initBeanDefinitionReader(beanDefinitionReader);
-
+		// 设置 xml 解析器
 		beanDefinitionReader.setDocumentReaderClass(MyBeanDefinitionDocumentReader.class);
 	}
 }

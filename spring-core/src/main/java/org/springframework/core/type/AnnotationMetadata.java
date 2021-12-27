@@ -16,6 +16,7 @@
 
 package org.springframework.core.type;
 
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
 /**
@@ -34,6 +35,8 @@ import java.util.Set;
 public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata {
 
 	/**
+	 * 类上注解的名称
+	 * @see Annotation#annotationType().getName
 	 * Get the fully qualified class names of all annotation types that
 	 * are <em>present</em> on the underlying class.
 	 * @return the annotation type names

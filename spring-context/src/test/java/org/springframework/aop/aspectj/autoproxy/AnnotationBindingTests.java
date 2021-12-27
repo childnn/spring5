@@ -32,6 +32,9 @@ public class AnnotationBindingTests {
 	private AnnotatedTestBean testBean;
 
 
+	/**
+	 * org/springframework/aop/aspectj/autoproxy/AnnotationBindingTests-context.xml
+	 */
 	@Before
 	public void setup() {
 		ClassPathXmlApplicationContext ctx =

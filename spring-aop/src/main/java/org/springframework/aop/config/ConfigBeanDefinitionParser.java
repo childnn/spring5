@@ -16,13 +16,6 @@
 
 package org.springframework.aop.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.springframework.aop.aspectj.AspectJAfterAdvice;
 import org.springframework.aop.aspectj.AspectJAfterReturningAdvice;
 import org.springframework.aop.aspectj.AspectJAfterThrowingAdvice;
@@ -48,6 +41,12 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link BeanDefinitionParser} for the {@code <aop:config>} tag.
@@ -108,14 +107,16 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		List<Element> childElts = DomUtils.getChildElements(element);
 		for (Element elt: childElts) {
 			String localName = parserContext.getDelegate().getLocalName(elt);
-			if (POINTCUT.equals(localName)) {
-				parsePointcut(elt, parserContext);
-			}
-			else if (ADVISOR.equals(localName)) {
-				parseAdvisor(elt, parserContext);
-			}
-			else if (ASPECT.equals(localName)) {
-				parseAspect(elt, parserContext);
+			switch (localName) {
+				case POINTCUT:
+					parsePointcut(elt, parserContext);
+					break;
+				case ADVISOR:
+					parseAdvisor(elt, parserContext);
+					break;
+				case ASPECT:
+					parseAspect(elt, parserContext);
+					break;
 			}
 		}
 
@@ -409,23 +410,19 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	 */
 	private Class<?> getAdviceClass(Element adviceElement, ParserContext parserContext) {
 		String elementName = parserContext.getDelegate().getLocalName(adviceElement);
-		if (BEFORE.equals(elementName)) {
-			return AspectJMethodBeforeAdvice.class;
-		}
-		else if (AFTER.equals(elementName)) {
-			return AspectJAfterAdvice.class;
-		}
-		else if (AFTER_RETURNING_ELEMENT.equals(elementName)) {
-			return AspectJAfterReturningAdvice.class;
-		}
-		else if (AFTER_THROWING_ELEMENT.equals(elementName)) {
-			return AspectJAfterThrowingAdvice.class;
-		}
-		else if (AROUND.equals(elementName)) {
-			return AspectJAroundAdvice.class;
-		}
-		else {
-			throw new IllegalArgumentException("Unknown advice kind [" + elementName + "].");
+		switch (elementName) {
+			case BEFORE:
+				return AspectJMethodBeforeAdvice.class;
+			case AFTER:
+				return AspectJAfterAdvice.class;
+			case AFTER_RETURNING_ELEMENT:
+				return AspectJAfterReturningAdvice.class;
+			case AFTER_THROWING_ELEMENT:
+				return AspectJAfterThrowingAdvice.class;
+			case AROUND:
+				return AspectJAroundAdvice.class;
+			default:
+				throw new IllegalArgumentException("Unknown advice kind [" + elementName + "].");
 		}
 	}
 

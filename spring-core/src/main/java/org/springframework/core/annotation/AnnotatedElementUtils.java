@@ -16,24 +16,16 @@
 
 package org.springframework.core.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * General utility methods for finding annotations, meta-annotations, and
@@ -94,6 +86,8 @@ import org.springframework.util.MultiValueMap;
  * @see AnnotationAttributes
  * @see AnnotationUtils
  * @see BridgeMethodResolver
+ * Get: 只是当前类, 或者基于 @Inherited
+ * Find: 包括 向上查找.
  */
 public abstract class AnnotatedElementUtils {
 
@@ -898,12 +892,17 @@ public abstract class AnnotatedElementUtils {
 	 * @param visited the set of annotated elements that have already been visited
 	 * @param metaDepth the meta-depth of the annotation
 	 * @return the result of the processor (potentially {@code null})
+	 * @see #searchWithGetSemanticsInAnnotations
 	 */
 	@Nullable
-	private static <T> T searchWithGetSemantics(AnnotatedElement element,
-			Set<Class<? extends Annotation>> annotationTypes, @Nullable String annotationName,
-			@Nullable Class<? extends Annotation> containerType, Processor<T> processor,
-			Set<AnnotatedElement> visited, int metaDepth) {
+	private static <T> T searchWithGetSemantics(
+			AnnotatedElement element, // 被标注注解的元素
+			Set<Class<? extends Annotation>> annotationTypes, // the annotation types to find
+			@Nullable String annotationName, //
+			@Nullable Class<? extends Annotation> containerType,
+			Processor<T> processor,
+			Set<AnnotatedElement> visited,
+			int metaDepth) {
 
 		if (visited.add(element)) {
 			try {
@@ -962,6 +961,7 @@ public abstract class AnnotatedElementUtils {
 	 * @param metaDepth the meta-depth of the annotation
 	 * @return the result of the processor (potentially {@code null})
 	 * @since 4.2
+	 * @see #searchWithGetSemantics
 	 */
 	@Nullable
 	private static <T> T searchWithGetSemanticsInAnnotations(@Nullable AnnotatedElement element,
@@ -972,6 +972,7 @@ public abstract class AnnotatedElementUtils {
 		// Search in annotations
 		for (Annotation annotation : annotations) {
 			Class<? extends Annotation> currentAnnotationType = annotation.annotationType();
+			// not java.lang.annotation.*
 			if (!AnnotationUtils.isInJavaLangAnnotationPackage(currentAnnotationType)) {
 				if (annotationTypes.contains(currentAnnotationType) ||
 						currentAnnotationType.getName().equals(annotationName) ||
@@ -1003,6 +1004,7 @@ public abstract class AnnotatedElementUtils {
 		// Recursively search in meta-annotations
 		for (Annotation annotation : annotations) {
 			Class<? extends Annotation> currentAnnotationType = annotation.annotationType();
+			// not start with java.* or org.spring.lang.*
 			if (!AnnotationUtils.hasPlainJavaAnnotationsOnly(currentAnnotationType)) {
 				T result = searchWithGetSemantics(currentAnnotationType, annotationTypes,
 						annotationName, containerType, processor, visited, metaDepth + 1);

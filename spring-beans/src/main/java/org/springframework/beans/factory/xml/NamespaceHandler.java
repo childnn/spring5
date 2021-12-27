@@ -44,11 +44,16 @@ import org.springframework.lang.Nullable;
  * @author Erik Wiersma
  * @since 2.0
  * @see DefaultBeanDefinitionDocumentReader
- * @see NamespaceHandlerResolver
+ * @see NamespaceHandlerResolver#resolve(String)  根据 namespace 获取注册的 Handler, 进而使用 handler 执行 parse 方法
+ * @see org.springframework.beans.factory.xml.NamespaceHandlerSupport
+ * @see org.springframework.beans.factory.xml.BeanDefinitionParser
+ * @see org.springframework.beans.factory.xml.BeanDefinitionDecorator
+ * handler 注册 parser,
  */
 public interface NamespaceHandler {
 
 	/**
+	 * 将 xml 标签与对应的 parser 关联, 在解析此标签时会使用对应的 parser
 	 * Invoked by the {@link DefaultBeanDefinitionDocumentReader} after
 	 * construction but before any custom elements are parsed.
 	 * @see NamespaceHandlerSupport#registerBeanDefinitionParser(String, BeanDefinitionParser)
@@ -56,6 +61,7 @@ public interface NamespaceHandler {
 	void init();
 
 	/**
+	 * Delegate to {@link BeanDefinitionParser#parse(Element, ParserContext)}
 	 * Parse the specified {@link Element} and register any resulting
 	 * {@link BeanDefinition BeanDefinitions} with the
 	 * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}

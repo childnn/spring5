@@ -16,12 +16,12 @@
 
 package org.springframework.context.annotation;
 
-import java.lang.annotation.Annotation;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.Assert;
+
+import java.lang.annotation.Annotation;
 
 /**
  * A {@link ScopeMetadataResolver} implementation that by default checks for
@@ -78,7 +78,7 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 	public ScopeMetadata resolveScopeMetadata(BeanDefinition definition) {
 		ScopeMetadata metadata = new ScopeMetadata();
 		if (definition instanceof AnnotatedBeanDefinition) {
-			AnnotatedBeanDefinition annDef = (AnnotatedBeanDefinition) definition;
+			AnnotatedBeanDefinition annDef = (AnnotatedBeanDefinition) definition; // org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition
 			AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(
 					annDef.getMetadata(), this.scopeAnnotationType);
 			if (attributes != null) {

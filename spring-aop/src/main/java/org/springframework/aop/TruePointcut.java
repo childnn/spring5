@@ -16,12 +16,17 @@
 
 package org.springframework.aop;
 
+import org.springframework.aop.framework.AbstractAdvisingBeanPostProcessor;
+import org.springframework.aop.framework.CglibAopProxy;
+
 import java.io.Serializable;
 
 /**
  * Canonical Pointcut instance that always matches.
  *
  * @author Rod Johnson
+ * @see CglibAopProxy#getProxy
+ * @see AbstractAdvisingBeanPostProcessor#postProcessAfterInitialization
  */
 @SuppressWarnings("serial")
 final class TruePointcut implements Pointcut, Serializable {

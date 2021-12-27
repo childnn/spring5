@@ -16,6 +16,8 @@
 
 package org.springframework.core.env;
 
+import org.springframework.util.PropertyPlaceholderHelper;
+
 /**
  * Interface representing the environment in which the current application is running.
  * Models two key aspects of the application environment: <em>profiles</em> and
@@ -67,6 +69,7 @@ package org.springframework.core.env;
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#setEnvironment
  * @see org.springframework.context.support.AbstractApplicationContext#createEnvironment
+ * @see PropertyPlaceholderHelper#replacePlaceholders
  */
 public interface Environment extends PropertyResolver {
 

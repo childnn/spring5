@@ -16,14 +16,14 @@
 
 package org.springframework.context.annotation;
 
+import org.springframework.beans.factory.support.BeanDefinitionReader;
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.springframework.beans.factory.support.BeanDefinitionReader;
-import org.springframework.core.annotation.AliasFor;
 
 /**
  * Indicates one or more resources containing bean definitions to import.
@@ -48,6 +48,7 @@ import org.springframework.core.annotation.AliasFor;
  * @since 3.0
  * @see Configuration
  * @see Import
+ * 引入配置文件, 一般就是指 bean.xml
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

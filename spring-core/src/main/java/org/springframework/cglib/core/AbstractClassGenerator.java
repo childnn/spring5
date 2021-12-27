@@ -16,16 +16,16 @@
 
 package org.springframework.cglib.core;
 
+import org.springframework.asm.ClassReader;
+import org.springframework.cglib.core.internal.Function;
+import org.springframework.cglib.core.internal.LoadingCache;
+
 import java.lang.ref.WeakReference;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-
-import org.springframework.asm.ClassReader;
-import org.springframework.cglib.core.internal.Function;
-import org.springframework.cglib.core.internal.LoadingCache;
 
 /**
  * Abstract class for all code-generating CGLIB utilities.
@@ -67,7 +67,7 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 
 	protected static class ClassLoaderData {
 
-		private final Set<String> reservedClassNames = new HashSet<String>();
+		private final Set<String> reservedClassNames = new HashSet<>();
 
 		/**
 		 * {@link AbstractClassGenerator} here holds "cache key" (e.g. {@link org.springframework.cglib.proxy.Enhancer}
@@ -87,31 +87,21 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 		 */
 		private final WeakReference<ClassLoader> classLoader;
 
-		private final Predicate uniqueNamePredicate = new Predicate() {
-			public boolean evaluate(Object name) {
-				return reservedClassNames.contains(name);
-			}
-		};
+		private final Predicate uniqueNamePredicate = reservedClassNames::contains;
 
-		private static final Function<AbstractClassGenerator, Object> GET_KEY = new Function<AbstractClassGenerator, Object>() {
-			public Object apply(AbstractClassGenerator gen) {
-				return gen.key;
-			}
-		};
+		private static final Function<AbstractClassGenerator, Object> GET_KEY = gen -> gen.key;
 
 		public ClassLoaderData(ClassLoader classLoader) {
 			if (classLoader == null) {
 				throw new IllegalArgumentException("classLoader == null is not yet supported");
 			}
-			this.classLoader = new WeakReference<ClassLoader>(classLoader);
+			this.classLoader = new WeakReference<>(classLoader);
 			Function<AbstractClassGenerator, Object> load =
-					new Function<AbstractClassGenerator, Object>() {
-						public Object apply(AbstractClassGenerator gen) {
-							Class klass = gen.generate(ClassLoaderData.this);
-							return gen.wrapCachedClass(klass);
-						}
+					gen -> {
+						Class klass = gen.generate(ClassLoaderData.this);
+						return gen.wrapCachedClass(klass);
 					};
-			generatedClasses = new LoadingCache<AbstractClassGenerator, Object, Object>(GET_KEY, load);
+			generatedClasses = new LoadingCache<>(GET_KEY, load);
 		}
 
 		public ClassLoader getClassLoader() {
@@ -308,7 +298,7 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 					cache = CACHE;
 					data = cache.get(loader);
 					if (data == null) {
-						Map<ClassLoader, ClassLoaderData> newCache = new WeakHashMap<ClassLoader, ClassLoaderData>(cache);
+						Map<ClassLoader, ClassLoaderData> newCache = new WeakHashMap<>(cache);
 						data = new ClassLoaderData(loader);
 						newCache.put(loader, data);
 						CACHE = newCache;

@@ -16,6 +16,15 @@
 
 package org.springframework.beans;
 
+import org.junit.Test;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceEditor;
+import org.springframework.tests.sample.beans.DerivedTestBean;
+import org.springframework.tests.sample.beans.ITestBean;
+import org.springframework.tests.sample.beans.TestBean;
+
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -28,22 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
-import org.junit.Test;
-
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceEditor;
-import org.springframework.tests.sample.beans.DerivedTestBean;
-import org.springframework.tests.sample.beans.ITestBean;
-import org.springframework.tests.sample.beans.TestBean;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link BeanUtils}.
@@ -111,7 +105,7 @@ public class BeanUtilsTests {
 		tb.setAge(32);
 		tb.setTouchy("touchy");
 		TestBean tb2 = new TestBean();
-		assertTrue("Name empty", tb2.getName() == null);
+		assertNull("Name empty", tb2.getName());
 		assertTrue("Age empty", tb2.getAge() == 0);
 		assertTrue("Touchy empty", tb2.getTouchy() == null);
 		BeanUtils.copyProperties(tb, tb2);
@@ -147,7 +141,7 @@ public class BeanUtilsTests {
 		assertTrue("Age empty", tb2.getAge() == 0);
 		assertTrue("Touchy empty", tb2.getTouchy() == null);
 		BeanUtils.copyProperties(tb, tb2);
-		assertTrue("Name copied", tb2.getName().equals(tb.getName()));
+		assertEquals("Name copied", tb2.getName(), tb.getName());
 		assertTrue("Age copied", tb2.getAge() == tb.getAge());
 		assertTrue("Touchy copied", tb2.getTouchy().equals(tb.getTouchy()));
 	}

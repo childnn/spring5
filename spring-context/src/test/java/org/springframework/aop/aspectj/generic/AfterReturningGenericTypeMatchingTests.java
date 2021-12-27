@@ -16,18 +16,21 @@
 
 package org.springframework.aop.aspectj.generic;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.tests.sample.beans.Employee;
 import org.springframework.tests.sample.beans.TestBean;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -39,23 +42,47 @@ import static org.junit.Assert.*;
  *
  * @author Ramnivas Laddad
  * @author Chris Beams
+ * @see org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
  */
+@ComponentScan
+@EnableAspectJAutoProxy
 public class AfterReturningGenericTypeMatchingTests {
 
 	private GenericReturnTypeVariationClass testBean;
 
 	private CounterAspect counterAspect;
 
-
-	@Before
+	// org/springframework/aop/aspectj/generic/AfterReturningGenericTypeMatchingTests-context.xml
+	// @Before
 	public void setup() {
 		ClassPathXmlApplicationContext ctx =
 				new ClassPathXmlApplicationContext(getClass().getSimpleName() + "-context.xml", getClass());
+		// AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+		// 		AfterReturningGenericTypeMatchingTests.class);
 
 		counterAspect = (CounterAspect) ctx.getBean("counterAspect");
 		counterAspect.reset();
 
 		testBean = (GenericReturnTypeVariationClass) ctx.getBean("testBean");
+	}
+
+	/**
+	 * @see org.springframework.aop.config.AopNamespaceHandler <aop:aspectj-autoproxy/>
+	 */
+	@Before
+	public void init() {
+		// 1. @ComponentScan,
+		// AOP: @EnableAspectJAutoProxy:  <aop:aspectj-autoproxy/>
+		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
+				AfterReturningGenericTypeMatchingTests.class);
+
+		// 2. @Component
+		counterAspect = ctx.getBean(CounterAspect.class);
+
+		counterAspect.reset();
+
+		testBean = ctx.getBean(GenericReturnTypeVariationClass.class);
+
 	}
 
 
@@ -102,7 +129,7 @@ public class AfterReturningGenericTypeMatchingTests {
 
 }
 
-
+@Component
 class GenericReturnTypeVariationClass {
 
 	public Collection<String> getStrings() {
@@ -122,7 +149,7 @@ class GenericReturnTypeVariationClass {
 	}
 }
 
-
+@Component // must be present
 @Aspect
 class CounterAspect {
 

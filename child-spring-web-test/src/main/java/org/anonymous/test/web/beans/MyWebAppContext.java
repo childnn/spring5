@@ -1,4 +1,4 @@
-package org.anonymous.test.web;
+package org.anonymous.test.web.beans;
 
 /**
  * ~~ Talk is cheap. Show me the code. ~~ :-)

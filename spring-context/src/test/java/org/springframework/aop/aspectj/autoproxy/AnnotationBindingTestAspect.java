@@ -17,14 +17,19 @@
 package org.springframework.aop.aspectj.autoproxy;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 
 /**
  * @author Adrian Colyer
  */
 class AnnotationBindingTestAspect {
 
-	public String doWithAnnotation(ProceedingJoinPoint pjp, TestAnnotation testAnnotation) throws Throwable {
-		return testAnnotation.value();
+	public String doWithAnnotation(ProceedingJoinPoint pjp, TestAnnotation t) throws Throwable {
+		Object aThis = pjp.getThis();
+		Object[] args = pjp.getArgs();
+		Object target = pjp.getTarget();
+		Signature signature = pjp.getSignature();
+		return t.value();
 	}
 
 }

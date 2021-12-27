@@ -14,5 +14,11 @@ repositories {
 dependencies {
 //    compile project(':spring-context')
     implementation project(':spring-context')
+    implementation project(':spring-aop')
+
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    implementation 'org.slf4j:slf4j-log4j12:2.0.0-alpha1'
+    optional("org.aspectj:aspectjweaver:${aspectjVersion}")
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation project(':spring-tx')
 }

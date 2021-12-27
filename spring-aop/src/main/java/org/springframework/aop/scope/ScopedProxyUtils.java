@@ -68,6 +68,7 @@ public abstract class ScopedProxyUtils {
 		proxyDefinition.setSource(definition.getSource());
 		proxyDefinition.setRole(targetDefinition.getRole());
 
+		// org.springframework.aop.scope.ScopedProxyFactoryBean.targetBeanName  -- FactoryBean
 		proxyDefinition.getPropertyValues().add("targetBeanName", targetBeanName);
 		if (proxyTargetClass) {
 			targetDefinition.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);

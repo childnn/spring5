@@ -44,6 +44,7 @@ public interface ApplicationContextInitializer<C extends ConfigurableApplication
 	/**
 	 * Initialize the given application context.
 	 * @param applicationContext the application to configure
+	 * @see org.springframework.web.servlet.FrameworkServlet#applyInitializers(org.springframework.context.ConfigurableApplicationContext)
 	 */
 	void initialize(C applicationContext);
 

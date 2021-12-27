@@ -16,20 +16,10 @@
 
 package org.springframework.aop.framework;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.Interceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
@@ -49,6 +39,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link org.springframework.beans.factory.FactoryBean} implementation that builds an
@@ -89,6 +88,30 @@ import org.springframework.util.ObjectUtils;
  * @see org.aopalliance.intercept.MethodInterceptor
  * @see org.springframework.aop.Advisor
  * @see Advised
+ * @see #setProxyTargetClass(boolean) true if we should proxy the target calss, rather than its
+ * 	interfaces. If this is true we need to use CGLIB.
+ * @see #setOptimize(boolean) whether to apply aggressive optomization to created proxies. Don't
+ * 	use this setting unless you understand how the relevant AOP proxy handles optimization. This
+ * 	is currently(spring-boot-v0.0.9) used only for CGLIB proxies; it has no effect with JDK dynamic
+ * 	proxies(the default).
+ * @see #setFrozen(boolean) whether advice changes should be disallowed once the proxy factory has
+ * 	been configured. Default is false.
+ * @see #setExposeProxy(boolean) whether the current proxy should be exposed in a ThreadLocal so
+ * 	that it can be accessed by the target. (It's available via the MethodInvocation without the need
+ * 	for a ThreadLocal.) If a target needs to obtain the proxy and exposeProxy is true, the target
+ * 	can use the {@link AopContext#currentProxy()} method.
+ * @see #setAopProxyFactory(AopProxyFactory) the implementation of AopProxyFactory to use. Offers a way
+ * 	of customizing whether to use dynamic proxies, CGLIB or other proxy strategy. The default implementation
+ * 	will choose dynamic proxies or CGLIB appropriately. There should be no need to use this property;
+ * 	it's intended to allow the addition of new proxy types in Spring 1.1.
+ * @see #setProxyInterfaces(Class[]) array of String interface names. If this isn't supplied, a CGLIIB
+ * 	proxy for the target class will be used.
+ * @see #setInterceptorNames(String...) String array of Advisor, interceptor or other advice names to apply.
+ * 	Ordering is significant. The names are bean names in the current factory, including bean names from
+ * 	ancestor factories.
+ * @see #setSingleton(boolean) whether or not the factory should return a single object, no matter how often
+ *  the {{@link #getObject()}} method is called.
+ * @see ProxyConfig
  */
 @SuppressWarnings("serial")
 public class ProxyFactoryBean extends ProxyCreatorSupport

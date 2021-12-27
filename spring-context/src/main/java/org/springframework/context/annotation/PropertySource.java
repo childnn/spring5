@@ -16,14 +16,14 @@
 
 package org.springframework.context.annotation;
 
+import org.springframework.core.io.support.PropertySourceFactory;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.springframework.core.io.support.PropertySourceFactory;
 
 /**
  * Annotation providing a convenient and declarative mechanism for adding a
@@ -162,6 +162,7 @@ import org.springframework.core.io.support.PropertySourceFactory;
  * @see org.springframework.core.env.PropertySource
  * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
  * @see org.springframework.core.env.MutablePropertySources
+ * 可以引入 .properties/.yml 文件
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

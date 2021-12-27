@@ -16,10 +16,6 @@
 
 package org.springframework.web.context.support;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
@@ -32,6 +28,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.ContextLoader;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * {@link org.springframework.web.context.WebApplicationContext WebApplicationContext}
@@ -92,8 +92,18 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	@Nullable
 	private ScopeMetadataResolver scopeMetadataResolver;
 
+	/**
+	 * 可能为空
+	 * @see #register(Class[])
+	 * @see #loadBeanDefinitions
+	 */
 	private final Set<Class<?>> componentClasses = new LinkedHashSet<>();
 
+	/**
+	 * 可能为空
+	 * @see #scan(String...)
+	 * @see #loadBeanDefinitions
+	 */
 	private final Set<String> basePackages = new LinkedHashSet<>();
 
 

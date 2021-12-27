@@ -16,46 +16,18 @@
 
 package org.springframework.cglib.proxy;
 
+import org.springframework.asm.ClassVisitor;
+import org.springframework.asm.Label;
+import org.springframework.asm.Type;
+import org.springframework.cglib.core.*;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.asm.ClassVisitor;
-import org.springframework.asm.Label;
-import org.springframework.asm.Type;
-import org.springframework.cglib.core.AbstractClassGenerator;
-import org.springframework.cglib.core.ClassEmitter;
-import org.springframework.cglib.core.CodeEmitter;
-import org.springframework.cglib.core.CodeGenerationException;
-import org.springframework.cglib.core.CollectionUtils;
-import org.springframework.cglib.core.Constants;
-import org.springframework.cglib.core.DuplicatesPredicate;
-import org.springframework.cglib.core.EmitUtils;
-import org.springframework.cglib.core.KeyFactory;
-import org.springframework.cglib.core.Local;
-import org.springframework.cglib.core.MethodInfo;
-import org.springframework.cglib.core.MethodInfoTransformer;
-import org.springframework.cglib.core.MethodWrapper;
-import org.springframework.cglib.core.ObjectSwitchCallback;
-import org.springframework.cglib.core.ProcessSwitchCallback;
-import org.springframework.cglib.core.ReflectUtils;
-import org.springframework.cglib.core.RejectModifierPredicate;
-import org.springframework.cglib.core.Signature;
-import org.springframework.cglib.core.Transformer;
-import org.springframework.cglib.core.TypeUtils;
-import org.springframework.cglib.core.VisibilityPredicate;
-import org.springframework.cglib.core.WeakCacheKey;
+import java.util.*;
 
 /**
  * Generates dynamic subclasses to enable method interception. This
@@ -202,13 +174,13 @@ public class Enhancer extends AbstractClassGenerator {
 	 */
 	public interface EnhancerKey {
 
-		public Object newInstance(String type,
-				String[] interfaces,
-				WeakCacheKey<CallbackFilter> filter,
-				Type[] callbackTypes,
-				boolean useFactory,
-				boolean interceptDuringConstruction,
-				Long serialVersionUID);
+		Object newInstance(String type,
+						   String[] interfaces,
+						   WeakCacheKey<CallbackFilter> filter,
+						   Type[] callbackTypes,
+						   boolean useFactory,
+						   boolean interceptDuringConstruction,
+						   Long serialVersionUID);
 	}
 
 
@@ -315,7 +287,7 @@ public class Enhancer extends AbstractClassGenerator {
 	 * @see #setCallback
 	 */
 	public void setCallbacks(Callback[] callbacks) {
-		if (callbacks != null && callbacks.length == 0) {
+		if (callbacks == null || callbacks.length == 0) {
 			throw new IllegalArgumentException("Array cannot be empty");
 		}
 		this.callbacks = callbacks;
@@ -366,7 +338,7 @@ public class Enhancer extends AbstractClassGenerator {
 	 * @param callbackTypes the array of callback types
 	 */
 	public void setCallbackTypes(Class[] callbackTypes) {
-		if (callbackTypes != null && callbackTypes.length == 0) {
+		if (callbackTypes == null || callbackTypes.length == 0) {
 			throw new IllegalArgumentException("Array cannot be empty");
 		}
 		this.callbackTypes = CallbackInfo.determineTypes(callbackTypes);
@@ -467,12 +439,12 @@ public class Enhancer extends AbstractClassGenerator {
 			callbackTypes = CallbackInfo.determineTypes(callbacks);
 		}
 		if (interfaces != null) {
-			for (int i = 0; i < interfaces.length; i++) {
-				if (interfaces[i] == null) {
+			for (Class anInterface : interfaces) {
+				if (anInterface == null) {
 					throw new IllegalStateException("Interfaces cannot be null");
 				}
-				if (!interfaces[i].isInterface()) {
-					throw new IllegalStateException(interfaces[i] + " is not an interface");
+				if (!anInterface.isInterface()) {
+					throw new IllegalStateException(anInterface + " is not an interface");
 				}
 			}
 		}
@@ -560,14 +532,13 @@ public class Enhancer extends AbstractClassGenerator {
 		preValidate();
 		Object key = KEY_FACTORY.newInstance((superclass != null) ? superclass.getName() : null,
 				ReflectUtils.getNames(interfaces),
-				filter == ALL_ZERO ? null : new WeakCacheKey<CallbackFilter>(filter),
+				filter == ALL_ZERO ? null : new WeakCacheKey<>(filter),
 				callbackTypes,
 				useFactory,
 				interceptDuringConstruction,
 				serialVersionUID);
 		this.currentKey = key;
-		Object result = super.create(key);
-		return result;
+		return super.create(key);
 	}
 
 	@Override
@@ -632,9 +603,9 @@ public class Enhancer extends AbstractClassGenerator {
 		ReflectUtils.addAllMethods(superclass, methods);
 		List target = (interfaceMethods != null) ? interfaceMethods : methods;
 		if (interfaces != null) {
-			for (int i = 0; i < interfaces.length; i++) {
-				if (interfaces[i] != Factory.class) {
-					ReflectUtils.addAllMethods(interfaces[i], target);
+			for (Class anInterface : interfaces) {
+				if (anInterface != Factory.class) {
+					ReflectUtils.addAllMethods(anInterface, target);
 				}
 			}
 		}
@@ -666,19 +637,17 @@ public class Enhancer extends AbstractClassGenerator {
 		final Set forcePublic = new HashSet();
 		getMethods(sc, interfaces, actualMethods, interfaceMethods, forcePublic);
 
-		List methods = CollectionUtils.transform(actualMethods, new Transformer() {
-			public Object transform(Object value) {
-				Method method = (Method) value;
-				int modifiers = Constants.ACC_FINAL
-						| (method.getModifiers()
-						& ~Constants.ACC_ABSTRACT
-						& ~Constants.ACC_NATIVE
-						& ~Constants.ACC_SYNCHRONIZED);
-				if (forcePublic.contains(MethodWrapper.create(method))) {
-					modifiers = (modifiers & ~Constants.ACC_PROTECTED) | Constants.ACC_PUBLIC;
-				}
-				return ReflectUtils.getMethodInfo(method, modifiers);
+		List methods = CollectionUtils.transform(actualMethods, value -> {
+			Method method = (Method) value;
+			int modifiers = Constants.ACC_FINAL
+					| (method.getModifiers()
+					& ~Constants.ACC_ABSTRACT
+					& ~Constants.ACC_NATIVE
+					& ~Constants.ACC_SYNCHRONIZED);
+			if (forcePublic.contains(MethodWrapper.create(method))) {
+				modifiers = (modifiers & ~Constants.ACC_PROTECTED) | Constants.ACC_PUBLIC;
 			}
+			return ReflectUtils.getMethodInfo(method, modifiers);
 		});
 
 		ClassEmitter e = new ClassEmitter(v);
@@ -801,7 +770,7 @@ public class Enhancer extends AbstractClassGenerator {
 			argumentTypes = Constants.EMPTY_CLASS_ARRAY;
 		}
 		EnhancerFactoryData factoryData = new EnhancerFactoryData(klass, argumentTypes, classOnly);
-		Field factoryDataField = null;
+		Field factoryDataField;
 		try {
 			// The subsequent dance is performed just once for each class,
 			// so it does not matter much how fast it goes
@@ -811,13 +780,10 @@ public class Enhancer extends AbstractClassGenerator {
 			callbackFilterField.setAccessible(true);
 			callbackFilterField.set(null, this.filter);
 		}
-		catch (NoSuchFieldException e) {
+		catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new CodeGenerationException(e);
 		}
-		catch (IllegalAccessException e) {
-			throw new CodeGenerationException(e);
-		}
-		return new WeakReference<EnhancerFactoryData>(factoryData);
+		return new WeakReference<>(factoryData);
 	}
 
 	@Override

@@ -16,22 +16,10 @@
 
 package org.springframework.util;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.SortedSet;
-
 import org.springframework.lang.Nullable;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Miscellaneous collection utility methods.
@@ -201,15 +189,15 @@ public abstract class CollectionUtils {
 	 * @param candidates the candidates to search for
 	 * @return the first present object, or {@code null} if not found
 	 */
-	@SuppressWarnings("unchecked")
+	// @SuppressWarnings("unchecked")
 	@Nullable
 	public static <E> E findFirstMatch(Collection<?> source, Collection<E> candidates) {
 		if (isEmpty(source) || isEmpty(candidates)) {
 			return null;
 		}
-		for (Object candidate : candidates) {
+		for (E candidate : candidates) {
 			if (source.contains(candidate)) {
-				return (E) candidate;
+				return candidate;
 			}
 		}
 		return null;
@@ -554,10 +542,11 @@ public abstract class CollectionUtils {
 
 		@Override
 		public boolean equals(Object other) {
-			if (this == other) {
-				return true;
-			}
-			return this.map.equals(other);
+			return this == other || map.equals(other);
+			// if (this == other) {
+			// 	return true;
+			// }
+			// return this.map.equals(other);
 		}
 
 		@Override

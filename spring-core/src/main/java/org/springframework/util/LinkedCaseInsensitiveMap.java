@@ -16,21 +16,12 @@
 
 package org.springframework.util;
 
+import org.springframework.lang.Nullable;
+
 import java.io.Serializable;
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.springframework.lang.Nullable;
 
 /**
  * {@link LinkedHashMap} variant that stores String keys in a case-insensitive
@@ -51,8 +42,10 @@ public class LinkedCaseInsensitiveMap<V> implements Map<String, V>, Serializable
 
 	private final LinkedHashMap<String, V> targetMap;
 
+	// key: lowercase-key, value: original key
 	private final HashMap<String, String> caseInsensitiveKeys;
 
+	// 用于转小写使用的 locale, 构造初始化
 	private final Locale locale;
 
 	@Nullable
