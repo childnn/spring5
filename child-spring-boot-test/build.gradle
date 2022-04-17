@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group 'org.springframework'
+version '5.1.14.BUILD-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //    compile project(':spring-context')
+    // implementation project(':spring-context')
+    // implementation project(':spring-aop')
+    implementation project(':child-spring-boot')
+    implementation project(':child-spring-boot-autoconfigure')
+
+
+    optional("org.aspectj:aspectjweaver:${aspectjVersion}")
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+}
+
+test {
+    useJUnitPlatform()
+}

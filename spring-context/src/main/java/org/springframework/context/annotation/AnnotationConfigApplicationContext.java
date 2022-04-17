@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
  * Standalone application context, accepting <em>component classes</em> as input &mdash;
  * in particular {@link Configuration @Configuration}-annotated classes, but also plain
  * {@link org.springframework.stereotype.Component @Component} types and JSR-330 compliant
- * classes using {@code javax.inject} annotations.
+ * classes using {@code jakarta.inject} annotations.
  *
  * <p>Allows for registering classes one by one using {@link #register(Class...)}
  * as well as for classpath scanning using {@link #scan(String...)}.
@@ -53,33 +53,26 @@ import java.util.function.Supplier;
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
-	/**
-	 * 可以认为这里的 Reader 和 Scanner 具有相同的功能.
-	 * Reader 是 register 一个/多个 配置类
-	 * Scanner 是扫描给定的包(base packages)
-	 * @see org.springframework.context.annotation.AnnotatedBeanDefinitionReader#register(Class[])
-	 * @see org.springframework.context.annotation.ClassPathBeanDefinitionScanner#scan(String...)
-	 * 这两个值是默认的, 无法自行设置.
-	 */
-	private final AnnotatedBeanDefinitionReader reader; // read the config class annotated with @Configuration.
+	private final AnnotatedBeanDefinitionReader reader;
 
-	private final ClassPathBeanDefinitionScanner scanner; // scanner the package.
+	private final ClassPathBeanDefinitionScanner scanner;
 
 
 	/**
 	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
-	 * @see #getEnvironment()
+	 *
+	 * @see AnnotatedBeanDefinitionReader#register
+	 * @see org.springframework.context.annotation.ClassPathBeanDefinitionScanner#scan
 	 */
 	public AnnotationConfigApplicationContext() {
-		// 此处会调用父类的构造方法: 构建 bean factory --- 此即所谓 IoC 容器
-		super(); // 这一行源码没有, 会默认调用的, 这里是方便调试加的
-		// public GenericApplicationContext() {
-		// 		this.beanFactory = new DefaultListableBeanFactory();
-		// 	}
-		// 初始化 reader/scanner, 并 getOrCreateEnvironment.
-		// 实际就是调用 #
+		super(); // new IoC
+		// StartupStep createAnnotatedBeanDefReader = this.getApplicationStartup().start("spring.context.annotated-bean-reader.create");
+		// reader 用来注册 component class - bean definition
+		// 所谓 component class 是指标注 @Configuration
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		// createAnnotatedBeanDefReader.end();
+		// scanner 用来扫描指定 package 中的 component
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -100,9 +93,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
-		this(); // 构建 IoC-container, reader, scanner
-		register(componentClasses); // 注册主配置类: reader.register(..)
-		refresh(); // 核心方法: 父类
+		// init reader/scanner
+		this();
+		// reader do read
+		register(componentClasses);
+		// new bean instance (non-lazy-singleton)
+		refresh();
 	}
 
 	/**
@@ -112,8 +108,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @param basePackages the packages to scan for component classes
 	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
+		// init reader/scanner
 		this();
-		scan(basePackages); // 包扫描: scanner.scan(...)
+		// scanner do scan
+		scan(basePackages);
 		refresh();
 	}
 
@@ -130,13 +128,15 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	}
 
 	/**
-	 * Provide a custom {@link BeanNameGenerator} for use with {@link AnnotatedBeanDefinitionReader}
+	 * Provide a custom {@link org.springframework.beans.factory.support.BeanNameGenerator} for use with {@link AnnotatedBeanDefinitionReader}
 	 * and/or {@link ClassPathBeanDefinitionScanner}, if any.
-	 * <p>Default is {@link org.springframework.context.annotation.AnnotationBeanNameGenerator}.
+	 * <p>Default is {@link AnnotationBeanNameGenerator}.
 	 * <p>Any call to this method must occur prior to calls to {@link #register(Class...)}
 	 * and/or {@link #scan(String...)}.
 	 * @see AnnotatedBeanDefinitionReader#setBeanNameGenerator
 	 * @see ClassPathBeanDefinitionScanner#setBeanNameGenerator
+	 * @see AnnotationBeanNameGenerator
+	 * @see FullyQualifiedAnnotationBeanNameGenerator
 	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
 		this.reader.setBeanNameGenerator(beanNameGenerator);
@@ -173,7 +173,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	@Override
 	public void register(Class<?>... componentClasses) {
 		Assert.notEmpty(componentClasses, "At least one component class must be specified");
+		// StartupStep registerComponentClass = this.getApplicationStartup().start("spring.context.component-classes.register")
+		// 		.tag("classes", () -> Arrays.toString(componentClasses));
 		this.reader.register(componentClasses);
+		// registerComponentClass.end();
 	}
 
 	/**
@@ -187,56 +190,22 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	@Override
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
+		// StartupStep scanPackages = this.getApplicationStartup().start("spring.context.base-packages.scan")
+		// 		.tag("packages", () -> Arrays.toString(basePackages));
 		this.scanner.scan(basePackages);
+		// scanPackages.end();
 	}
 
 
 	//---------------------------------------------------------------------
-	// Convenient methods for registering individual beans
+	// Adapt superclass registerBean calls to AnnotatedBeanDefinitionReader
 	//---------------------------------------------------------------------
-
-	/**
-	 * Register a bean from the given bean class, deriving its metadata from
-	 * class-declared annotations, and optionally providing explicit constructor
-	 * arguments for consideration in the autowiring process.
-	 * <p>The bean name will be generated according to annotated component rules.
-	 * @param beanClass the class of the bean
-	 * @param constructorArguments argument values to be fed into Spring's
-	 * constructor resolution algorithm, resolving either all arguments or just
-	 * specific ones, with the rest to be resolved through regular autowiring
-	 * (may be {@code null} or empty)
-	 * @since 5.0
-	 */
-	public <T> void registerBean(Class<T> beanClass, Object... constructorArguments) {
-		registerBean(null, beanClass, constructorArguments);
-	}
-
-	/**
-	 * Register a bean from the given bean class, deriving its metadata from
-	 * class-declared annotations, and optionally providing explicit constructor
-	 * arguments for consideration in the autowiring process.
-	 * @param beanName the name of the bean (may be {@code null})
-	 * @param beanClass the class of the bean
-	 * @param constructorArguments argument values to be fed into Spring's
-	 * constructor resolution algorithm, resolving either all arguments or just
-	 * specific ones, with the rest to be resolved through regular autowiring
-	 * (may be {@code null} or empty)
-	 * @since 5.0
-	 */
-	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass, Object... constructorArguments) {
-		this.reader.doRegisterBean(beanClass, null, beanName, null,
-				bd -> {
-					for (Object arg : constructorArguments) {
-						bd.getConstructorArgumentValues().addGenericArgumentValue(arg);
-					}
-				});
-	}
 
 	@Override
-	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass, @Nullable Supplier<T> supplier,
-			BeanDefinitionCustomizer... customizers) {
+	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass,
+								 @Nullable Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
 
-		this.reader.doRegisterBean(beanClass, supplier, beanName, null, customizers);
+		this.reader.registerBean(beanClass, beanName, supplier, customizers);
 	}
 
 }

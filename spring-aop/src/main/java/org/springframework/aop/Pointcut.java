@@ -29,6 +29,14 @@ package org.springframework.aop;
  * @see org.springframework.aop.support.Pointcuts
  * @see org.springframework.aop.support.ClassFilters
  * @see org.springframework.aop.support.MethodMatchers
+ * ---
+ * PointCut通俗地翻译为切入点，一个程序会有多个Join Point，即使同一个函数，
+ * 也还分为call和execution类型的Join Point，但并不是所有的Join Point都是我们关心的，
+ * Pointcut就是提供一种使得开发者能够选择自己需要的JoinPoint的方法。
+ * PointCut分为 call、execution、target、this、within 等关键字。
+ * 与joinPoint相比，pointcut就是一个具体的切点。
+ * @see org.aopalliance.intercept.Joinpoint
+ * @see org.aspectj.lang.JoinPoint
  */
 public interface Pointcut {
 

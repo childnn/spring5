@@ -36,6 +36,26 @@ import java.lang.reflect.AccessibleObject;
  *
  * @author Rod Johnson
  * @see Interceptor
+ * 连接点
+ * method call	     函数调用	比如调用Logger.info()，这是一处JoinPoint
+ * method execution	 函数执行	比如Logger.info()的执行内部，是一处JoinPoint。
+ *                              注意它和method call的区别。method call是调用某个函数的地方。
+ *                              而execution是某个函数执行的内部。
+ * constructor call	 构造函数调用	和method call类似
+ * constructor execution 构造函数执行	和method execution类似
+ * field get	     获取某个变量	 比如读取User.name成员
+ * field set	     设置某个变量	 比如设置User.name成员
+ * pre-initialization	Object在构造函数中做得一些工作。
+ * initialization	Object在构造函数中做得工作
+ * static initialization	类初始化	比如类的static{}
+ * handler	异常处理	比如try catch(xxx)中，对应catch内的执行
+ * advice execution	这个是AspectJ的内容
+ * --
+ * 这里列出了AspectJ所认可的JoinPoint的类型。实际上，连接点也就是你想把新的代码插在程序的哪个地方，
+ * 是插在构造方法中，还是插在某个方法调用前，或者是插在某个方法中，这个地方就是JoinPoint，
+ * 当然，不是所有地方都能给你插的，只有能插的地方，才叫JoinPoint。
+ * @see org.aspectj.lang.reflect.Pointcut
+ * @see org.springframework.aop.Pointcut
  */
 public interface Joinpoint {
 

@@ -17,7 +17,6 @@
 package org.springframework.aop;
 
 import org.springframework.aop.framework.AbstractAdvisingBeanPostProcessor;
-import org.springframework.aop.framework.CglibAopProxy;
 
 import java.io.Serializable;
 
@@ -25,7 +24,7 @@ import java.io.Serializable;
  * Canonical Pointcut instance that always matches.
  *
  * @author Rod Johnson
- * @see CglibAopProxy#getProxy
+ * @see org.springframework.aop.framework.CglibAopProxy#getProxy
  * @see AbstractAdvisingBeanPostProcessor#postProcessAfterInitialization
  */
 @SuppressWarnings("serial")

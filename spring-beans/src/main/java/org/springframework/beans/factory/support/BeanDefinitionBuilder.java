@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package org.springframework.beans.factory.support;
 
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
+
+import java.util.function.Supplier;
 
 /**
  * Programmatic means of constructing
@@ -101,7 +102,7 @@ public final class BeanDefinitionBuilder {
 	 * @param beanClass the {@code Class} of the bean that the definition is being created for
 	 */
 	public static BeanDefinitionBuilder rootBeanDefinition(Class<?> beanClass) {
-		return rootBeanDefinition(beanClass, null);
+		return rootBeanDefinition(beanClass, (String) null);
 	}
 
 	/**
@@ -117,7 +118,34 @@ public final class BeanDefinitionBuilder {
 	}
 
 	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 *
+	 * @param beanType         the {@link org.springframework.core.ResolvableType type} of the bean that the definition is being created for
+	 * @param instanceSupplier a callback for creating an instance of the bean
+	 * @since 5.3.9
+	 */
+	public static <T> BeanDefinitionBuilder rootBeanDefinition(ResolvableType beanType, Supplier<T> instanceSupplier) {
+		RootBeanDefinition beanDefinition = new RootBeanDefinition();
+		beanDefinition.setTargetType(beanType);
+		beanDefinition.setInstanceSupplier(instanceSupplier);
+		return new BeanDefinitionBuilder(beanDefinition);
+	}
+
+	/**
+	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link RootBeanDefinition}.
+	 *
+	 * @param beanClass        the {@code Class} of the bean that the definition is being created for
+	 * @param instanceSupplier a callback for creating an instance of the bean
+	 * @see #rootBeanDefinition(org.springframework.core.ResolvableType, java.util.function.Supplier)
+	 * @since 5.3.9
+	 */
+	public static <T> BeanDefinitionBuilder rootBeanDefinition(Class<T> beanClass, Supplier<T> instanceSupplier) {
+		return rootBeanDefinition(ResolvableType.forClass(beanClass), instanceSupplier);
+	}
+
+	/**
 	 * Create a new {@code BeanDefinitionBuilder} used to construct a {@link ChildBeanDefinition}.
+	 *
 	 * @param parentName the name of the parent bean
 	 */
 	public static BeanDefinitionBuilder childBeanDefinition(String parentName) {
@@ -320,7 +348,19 @@ public final class BeanDefinitionBuilder {
 	}
 
 	/**
+	 * Set whether this bean is 'synthetic', that is, not defined by
+	 * the application itself.
+	 *
+	 * @since 5.3.9
+	 */
+	public BeanDefinitionBuilder setSynthetic(boolean synthetic) {
+		this.beanDefinition.setSynthetic(synthetic);
+		return this;
+	}
+
+	/**
 	 * Apply the given customizers to the underlying bean definition.
+	 *
 	 * @since 5.0
 	 */
 	public BeanDefinitionBuilder applyCustomizers(BeanDefinitionCustomizer... customizers) {

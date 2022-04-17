@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * {@link LinkedHashMap} subclass representing annotation attribute
+ * {@link java.util.LinkedHashMap} subclass representing annotation attribute
  * <em>key-value</em> pairs as read by {@link AnnotationUtils},
  * {@link AnnotatedElementUtils}, and Spring's reflection- and ASM-based
  * {@link org.springframework.core.type.AnnotationMetadata} implementations.
@@ -39,12 +39,12 @@ import java.util.Map;
  * @author Chris Beams
  * @author Sam Brannen
  * @author Juergen Hoeller
- * @since 3.1.1
  * @see AnnotationUtils#getAnnotationAttributes
  * @see AnnotatedElementUtils
+ * @since 3.1.1
  */
 @SuppressWarnings("serial")
-public class AnnotationAttributes extends LinkedHashMap<String, Object> { // key: 注解的属性名, value: 注解属性的值
+public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 
 	private static final String UNKNOWN = "unknown";
 
@@ -78,8 +78,9 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> { // key
 	/**
 	 * Create a new {@link AnnotationAttributes} instance, wrapping the provided
 	 * map and all its <em>key-value</em> pairs.
+	 *
 	 * @param map original source of annotation attribute <em>key-value</em> pairs
-	 * @see #fromMap(Map)
+	 * @see #fromMap(java.util.Map)
 	 */
 	public AnnotationAttributes(Map<String, Object> map) {
 		super(map);
@@ -91,7 +92,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> { // key
 	 * Create a new {@link AnnotationAttributes} instance, wrapping the provided
 	 * map and all its <em>key-value</em> pairs.
 	 * @param other original source of annotation attribute <em>key-value</em> pairs
-	 * @see #fromMap(Map)
+	 * @see #fromMap(java.util.Map)
 	 */
 	public AnnotationAttributes(AnnotationAttributes other) {
 		super(other);
@@ -111,6 +112,23 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> { // key
 		Assert.notNull(annotationType, "'annotationType' must not be null");
 		this.annotationType = annotationType;
 		this.displayName = annotationType.getName();
+	}
+
+	/**
+	 * Create a possibly already validated new, empty
+	 * {@link AnnotationAttributes} instance for the specified
+	 * {@code annotationType}.
+	 *
+	 * @param annotationType the type of annotation represented by this
+	 *                       {@code AnnotationAttributes} instance; never {@code null}
+	 * @param validated      if the attributes are considered already validated
+	 * @since 5.2
+	 */
+	AnnotationAttributes(Class<? extends Annotation> annotationType, boolean validated) {
+		Assert.notNull(annotationType, "'annotationType' must not be null");
+		this.annotationType = annotationType;
+		this.displayName = annotationType.getName();
+		this.validated = validated;
 	}
 
 	/**
@@ -378,9 +396,11 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> { // key
 			sb.append(entry.getKey());
 			sb.append('=');
 			sb.append(valueToString(entry.getValue()));
-			sb.append(entries.hasNext() ? ", " : "");
+			if (entries.hasNext()) {
+				sb.append(", ");
+			}
 		}
-		sb.append("}");
+		sb.append('}');
 		return sb.toString();
 	}
 
@@ -400,7 +420,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> { // key
 	 * <p>If the map is already an {@code AnnotationAttributes} instance, it
 	 * will be cast and returned immediately without creating a new instance.
 	 * Otherwise a new instance will be created by passing the supplied map
-	 * to the {@link #AnnotationAttributes(Map)} constructor.
+	 * to the {@link #AnnotationAttributes(java.util.Map)} constructor.
 	 * @param map original source of annotation attribute <em>key-value</em> pairs
 	 */
 	@Nullable

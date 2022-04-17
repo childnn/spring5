@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,6 @@
 
 package org.springframework.context.annotation;
 
-import java.beans.Introspector;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -31,39 +27,54 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
+import java.beans.Introspector;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * {@link org.springframework.beans.factory.support.BeanNameGenerator}
- * implementation for bean classes annotated with the
- * {@link org.springframework.stereotype.Component @Component} annotation
- * or with another annotation that is itself annotated with
- * {@link org.springframework.stereotype.Component @Component} as a
+ * {@link org.springframework.beans.factory.support.BeanNameGenerator} implementation for bean classes annotated with the
+ * {@link org.springframework.stereotype.Component @Component} annotation or
+ * with another annotation that is itself annotated with {@code @Component} as a
  * meta-annotation. For example, Spring's stereotype annotations (such as
  * {@link org.springframework.stereotype.Repository @Repository}) are
- * themselves annotated with
- * {@link org.springframework.stereotype.Component @Component}.
+ * themselves annotated with {@code @Component}.
  *
- * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
- * JSR-330's {@link javax.inject.Named} annotations, if available. Note that
+ * <p>Also supports Jakarta EE's {@link jakarta.annotation.ManagedBean} and
+ * JSR-330's {@link jakarta.inject.Named} annotations, if available. Note that
  * Spring component annotations always override such standard annotations.
  *
  * <p>If the annotation's value doesn't indicate a bean name, an appropriate
  * name will be built based on the short name of the class (with the first
- * letter lower-cased). For example:
+ * letter lower-cased), unless the two first letters are uppercase. For example:
  *
  * <pre class="code">com.xyz.FooServiceImpl -&gt; fooServiceImpl</pre>
+ * <pre class="code">com.xyz.URLFooServiceImpl -&gt; URLFooServiceImpl</pre>
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
- * @since 2.5
  * @see org.springframework.stereotype.Component#value()
  * @see org.springframework.stereotype.Repository#value()
  * @see org.springframework.stereotype.Service#value()
  * @see org.springframework.stereotype.Controller#value()
- * @see javax.inject.Named#value()
+ * @see jakarta.inject.Named#value()
+ * @see FullyQualifiedAnnotationBeanNameGenerator
+ * @since 2.5
  */
 public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
+	/**
+	 * A convenient constant for a default {@code AnnotationBeanNameGenerator} instance,
+	 * as used for component scanning purposes.
+	 *
+	 * @since 5.2
+	 */
+	public static final AnnotationBeanNameGenerator INSTANCE = new AnnotationBeanNameGenerator();
+
 	private static final String COMPONENT_ANNOTATION_CLASSNAME = "org.springframework.stereotype.Component";
+
+	private final Map<String, Set<String>> metaAnnotationTypesCache = new ConcurrentHashMap<>();
 
 
 	@Override
@@ -91,16 +102,22 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 		String beanName = null;
 		for (String type : types) {
 			AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(amd, type);
-			if (attributes != null && isStereotypeWithNameValue(type, amd.getMetaAnnotationTypes(type), attributes)) {
-				Object value = attributes.get("value");
-				if (value instanceof String) {
-					String strVal = (String) value;
-					if (StringUtils.hasLength(strVal)) {
-						if (beanName != null && !strVal.equals(beanName)) {
-							throw new IllegalStateException("Stereotype annotations suggest inconsistent " +
-									"component names: '" + beanName + "' versus '" + strVal + "'");
+			if (attributes != null) {
+				Set<String> metaTypes = this.metaAnnotationTypesCache.computeIfAbsent(type, key -> {
+					Set<String> result = amd.getMetaAnnotationTypes(key);
+					return (result.isEmpty() ? Collections.emptySet() : result);
+				});
+				if (isStereotypeWithNameValue(type, metaTypes, attributes)) {
+					Object value = attributes.get("value");
+					if (value instanceof String) {
+						String strVal = (String) value;
+						if (StringUtils.hasLength(strVal)) {
+							if (beanName != null && !strVal.equals(beanName)) {
+								throw new IllegalStateException("Stereotype annotations suggest inconsistent " +
+										"component names: '" + beanName + "' versus '" + strVal + "'");
+							}
+							beanName = strVal;
 						}
-						beanName = strVal;
 					}
 				}
 			}
@@ -121,17 +138,18 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 		boolean isStereotype = annotationType.equals(COMPONENT_ANNOTATION_CLASSNAME) ||
 				metaAnnotationTypes.contains(COMPONENT_ANNOTATION_CLASSNAME) ||
-				annotationType.equals("javax.annotation.ManagedBean") ||
-				annotationType.equals("javax.inject.Named");
+				annotationType.equals("jakarta.annotation.ManagedBean") ||
+				annotationType.equals("jakarta.inject.Named");
 
 		return (isStereotype && attributes != null && attributes.containsKey("value"));
 	}
 
 	/**
 	 * Derive a default bean name from the given bean definition.
-	 * <p>The default implementation delegates to {@link #buildDefaultBeanName(BeanDefinition)}.
+	 * <p>The default implementation delegates to {@link #buildDefaultBeanName(org.springframework.beans.factory.config.BeanDefinition)}.
+	 *
 	 * @param definition the bean definition to build a bean name for
-	 * @param registry the registry that the given bean definition is being registered with
+	 * @param registry   the registry that the given bean definition is being registered with
 	 * @return the default bean name (never {@code null})
 	 */
 	protected String buildDefaultBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
@@ -141,7 +159,7 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	/**
 	 * Derive a default bean name from the given bean definition.
 	 * <p>The default implementation simply builds a decapitalized version
-	 * of the short class name: e.g. "mypackage.MyJdbcDao" -> "myJdbcDao".
+	 * of the short class name: e.g. "mypackage.MyJdbcDao" &rarr; "myJdbcDao".
 	 * <p>Note that inner classes will thus have names of the form
 	 * "outerClassName.InnerClassName", which because of the period in the
 	 * name may be an issue if you are autowiring by name.

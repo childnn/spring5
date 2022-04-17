@@ -23,13 +23,16 @@ include "spring-framework-bom"
 
 // Exposes gradle buildSrc for IDE support
 include "buildSrc"
-rootProject.children.find{ it.name == "buildSrc" }.name = "spring-build-src"
+rootProject.children.find { it.name == "buildSrc" }.name = "spring-build-src"
 
 rootProject.name = "spring"
-rootProject.children.each {project ->
-	project.buildFileName = "${project.name}.gradle"
+rootProject.children.each { project ->
+    project.buildFileName = "${project.name}.gradle"
 }
 // 自创建的模块
 include 'child-spring-test'
 include 'child-spring-web-test'
+include 'child-spring-boot'
+include 'child-spring-boot-autoconfigure'
+include 'child-spring-boot-test'
 

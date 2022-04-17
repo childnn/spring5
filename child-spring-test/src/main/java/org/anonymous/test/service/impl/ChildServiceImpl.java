@@ -5,6 +5,7 @@ import org.anonymous.test.service.ChildService;
 import org.anonymous.test.sterotype.MyService;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -22,7 +23,7 @@ import javax.annotation.PreDestroy;
 public class ChildServiceImpl implements ChildService,
 		InitializingBean, DisposableBean {
 
-	// @Autowired
+	@Autowired
 	// @Qualifier("BServiceImpl")
 	private final BService bService;
 
@@ -45,6 +46,7 @@ public class ChildServiceImpl implements ChildService,
 	@Override
 	public void hello() {
 		System.out.println("hello spring!!!");
+		BService bService = this.bService;
 	}
 
 	@PreDestroy

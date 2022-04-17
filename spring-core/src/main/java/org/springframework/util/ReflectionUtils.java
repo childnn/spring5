@@ -16,19 +16,14 @@
 
 package org.springframework.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
+import org.springframework.lang.Nullable;
+
+import java.lang.reflect.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Simple utility class for working with the reflection API and handling
@@ -240,7 +235,8 @@ public abstract class ReflectionUtils {
 		Assert.notNull(name, "Method name must not be null");
 		Class<?> searchType = clazz;
 		while (searchType != null) {
-			Method[] methods = (searchType.isInterface() ? searchType.getMethods() : getDeclaredMethods(searchType));
+			Method[] methods = (searchType.isInterface() ? searchType.getMethods() :
+					getDeclaredMethods(searchType, false));
 			for (Method method : methods) {
 				if (name.equals(method.getName()) &&
 						(paramTypes == null || Arrays.equals(paramTypes, method.getParameterTypes()))) {
@@ -364,7 +360,7 @@ public abstract class ReflectionUtils {
 	 * @see #doWithMethods
 	 */
 	public static void doWithLocalMethods(Class<?> clazz, MethodCallback mc) {
-		Method[] methods = getDeclaredMethods(clazz);
+		Method[] methods = getDeclaredMethods(clazz, false);
 		for (Method method : methods) {
 			try {
 				mc.doWith(method);
@@ -401,7 +397,7 @@ public abstract class ReflectionUtils {
 	 */
 	public static void doWithMethods(Class<?> clazz, MethodCallback mc, @Nullable MethodFilter mf) {
 		// Keep backing up the inheritance hierarchy.
-		Method[] methods = getDeclaredMethods(clazz);
+		Method[] methods = getDeclaredMethods(clazz, false);
 		for (Method method : methods) {
 			if (mf != null && !mf.matches(method)) {
 				continue;
@@ -413,10 +409,9 @@ public abstract class ReflectionUtils {
 				throw new IllegalStateException("Not allowed to access method '" + method.getName() + "': " + ex);
 			}
 		}
-		if (clazz.getSuperclass() != null) {
+		if (clazz.getSuperclass() != null && (mf != USER_DECLARED_METHODS || clazz.getSuperclass() != Object.class)) {
 			doWithMethods(clazz.getSuperclass(), mc, mf);
-		}
-		else if (clazz.isInterface()) {
+		} else if (clazz.isInterface()) {
 			for (Class<?> superIfc : clazz.getInterfaces()) {
 				doWithMethods(superIfc, mc, mf);
 			}
@@ -472,16 +467,33 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * Variant of {@link Class#getDeclaredMethods()} that uses a local cache in
+	 * order to avoid new Method instances. In addition, it also includes Java 8
+	 * default methods from locally implemented interfaces, since those are
+	 * effectively to be treated just like declared methods.
+	 *
+	 * @param clazz the class to introspect
+	 * @return the cached array of methods
+	 * @throws IllegalStateException if introspection fails
+	 * @see Class#getDeclaredMethods()
+	 * @since 5.2
+	 */
+	public static Method[] getDeclaredMethods(Class<?> clazz) {
+		return getDeclaredMethods(clazz, true);
+	}
+
+	/**
 	 * This variant retrieves {@link Class#getDeclaredMethods()} from a local cache
 	 * in order to avoid the JVM's SecurityManager check and defensive array copying.
 	 * In addition, it also includes Java 8 default methods from locally implemented
 	 * interfaces, since those are effectively to be treated just like declared methods.
+	 *
 	 * @param clazz the class to introspect
 	 * @return the cached array of methods
 	 * @throws IllegalStateException if introspection fails
 	 * @see Class#getDeclaredMethods()
 	 */
-	private static Method[] getDeclaredMethods(Class<?> clazz) {
+	private static Method[] getDeclaredMethods(Class<?> clazz, boolean defensive) {
 		Assert.notNull(clazz, "Class must not be null");
 		Method[] result = declaredMethodsCache.get(clazz);
 		if (result == null) {
@@ -496,19 +508,46 @@ public abstract class ReflectionUtils {
 						result[index] = defaultMethod;
 						index++;
 					}
-				}
-				else {
+				} else {
 					result = declaredMethods;
 				}
 				declaredMethodsCache.put(clazz, (result.length == 0 ? EMPTY_METHOD_ARRAY : result));
-			}
-			catch (Throwable ex) {
+			} catch (Throwable ex) {
 				throw new IllegalStateException("Failed to introspect Class [" + clazz.getName() +
 						"] from ClassLoader [" + clazz.getClassLoader() + "]", ex);
 			}
 		}
-		return result;
+		return (result.length == 0 || !defensive) ? result : result.clone();
 	}
+
+	// public static Method[] getDeclaredMethods(Class<?> clazz) {
+	// 	Assert.notNull(clazz, "Class must not be null");
+	// 	Method[] result = declaredMethodsCache.get(clazz);
+	// 	if (result == null) {
+	// 		try {
+	// 			Method[] declaredMethods = clazz.getDeclaredMethods();
+	// 			List<Method> defaultMethods = findConcreteMethodsOnInterfaces(clazz);
+	// 			if (defaultMethods != null) {
+	// 				result = new Method[declaredMethods.length + defaultMethods.size()];
+	// 				System.arraycopy(declaredMethods, 0, result, 0, declaredMethods.length);
+	// 				int index = declaredMethods.length;
+	// 				for (Method defaultMethod : defaultMethods) {
+	// 					result[index] = defaultMethod;
+	// 					index++;
+	// 				}
+	// 			}
+	// 			else {
+	// 				result = declaredMethods;
+	// 			}
+	// 			declaredMethodsCache.put(clazz, (result.length == 0 ? EMPTY_METHOD_ARRAY : result));
+	// 		}
+	// 		catch (Throwable ex) {
+	// 			throw new IllegalStateException("Failed to introspect Class [" + clazz.getName() +
+	// 					"] from ClassLoader [" + clazz.getClassLoader() + "]", ex);
+	// 		}
+	// 	}
+	// 	return result;
+	// }
 
 	@Nullable
 	private static List<Method> findConcreteMethodsOnInterfaces(Class<?> clazz) {

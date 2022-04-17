@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 
 package org.springframework.core.type;
 
-import java.util.Map;
-
+import org.springframework.core.annotation.*;
+import org.springframework.core.annotation.MergedAnnotation.Adapt;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
+
+import java.lang.annotation.Annotation;
+import java.util.Map;
 
 /**
  * Defines access to the annotations of a specific type ({@link AnnotationMetadata class}
@@ -32,35 +35,50 @@ import org.springframework.util.MultiValueMap;
  * @author Chris Beams
  * @author Phillip Webb
  * @author Sam Brannen
- * @since 4.0
  * @see AnnotationMetadata
  * @see MethodMetadata
+ * @since 4.0
  */
 public interface AnnotatedTypeMetadata {
+
+	/**
+	 * Return annotation details based on the direct annotations of the
+	 * underlying element.
+	 *
+	 * @return merged annotations based on the direct annotations
+	 * @since 5.2
+	 */
+	MergedAnnotations getAnnotations();
 
 	/**
 	 * Determine whether the underlying element has an annotation or meta-annotation
 	 * of the given type defined.
 	 * <p>If this method returns {@code true}, then
 	 * {@link #getAnnotationAttributes} will return a non-null Map.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
+	 *                       type to look for
 	 * @return whether a matching annotation is defined
 	 */
-	boolean isAnnotated(String annotationName);
+	default boolean isAnnotated(String annotationName) {
+		return getAnnotations().isPresent(annotationName);
+	}
 
 	/**
 	 * Retrieve the attributes of the annotation of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation),
 	 * also taking attribute overrides on composed annotations into account.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
+	 *                       type to look for
 	 * @return a Map of attributes, with the attribute name as key (e.g. "value")
 	 * and the defined attribute value as Map value. This return value will be
 	 * {@code null} if no matching annotation is defined.
 	 */
 	@Nullable
-	Map<String, Object> getAnnotationAttributes(String annotationName);
+	default Map<String, Object> getAnnotationAttributes(String annotationName) {
+		return getAnnotationAttributes(annotationName, false);
+	}
 
 	/**
 	 * Retrieve the attributes of the annotation of the given type, if any (i.e. if
@@ -76,35 +94,57 @@ public interface AnnotatedTypeMetadata {
 	 * {@code null} if no matching annotation is defined.
 	 */
 	@Nullable
-	Map<String, Object> getAnnotationAttributes(String annotationName, boolean classValuesAsString);
+	default Map<String, Object> getAnnotationAttributes(String annotationName,
+														boolean classValuesAsString) {
+
+		MergedAnnotation<Annotation> annotation = getAnnotations().get(annotationName,
+				null, MergedAnnotationSelectors.firstDirectlyDeclared());
+		if (!annotation.isPresent()) {
+			return null;
+		}
+		return annotation.asAnnotationAttributes(Adapt.values(classValuesAsString, true));
+	}
 
 	/**
 	 * Retrieve all attributes of all annotations of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation).
 	 * Note that this variant does <i>not</i> take attribute overrides into account.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
+	 *                       type to look for
 	 * @return a MultiMap of attributes, with the attribute name as key (e.g. "value")
 	 * and a list of the defined attribute values as Map value. This return value will
 	 * be {@code null} if no matching annotation is defined.
 	 * @see #getAllAnnotationAttributes(String, boolean)
 	 */
 	@Nullable
-	MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName);
+	default MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName) {
+		return getAllAnnotationAttributes(annotationName, false);
+	}
 
 	/**
 	 * Retrieve all attributes of all annotations of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation).
 	 * Note that this variant does <i>not</i> take attribute overrides into account.
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
-	 * @param classValuesAsString  whether to convert class references to String
+	 *
+	 * @param annotationName      the fully qualified class name of the annotation
+	 *                            type to look for
+	 * @param classValuesAsString whether to convert class references to String
 	 * @return a MultiMap of attributes, with the attribute name as key (e.g. "value")
 	 * and a list of the defined attribute values as Map value. This return value will
 	 * be {@code null} if no matching annotation is defined.
 	 * @see #getAllAnnotationAttributes(String)
 	 */
 	@Nullable
-	MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName, boolean classValuesAsString);
+	default MultiValueMap<String, Object> getAllAnnotationAttributes(
+			String annotationName, boolean classValuesAsString) {
+
+		Adapt[] adaptations = Adapt.values(classValuesAsString, true);
+		return getAnnotations().stream(annotationName)
+				.filter(MergedAnnotationPredicates.unique(MergedAnnotation::getMetaTypes))
+				.map(MergedAnnotation::withNonMergedAttributes)
+				.collect(MergedAnnotationCollectors.toMultiValueMap(map ->
+						map.isEmpty() ? null : map, adaptations));
+	}
 
 }

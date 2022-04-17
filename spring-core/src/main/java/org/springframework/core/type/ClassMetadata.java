@@ -27,7 +27,6 @@ import org.springframework.lang.Nullable;
  * @see StandardClassMetadata
  * @see org.springframework.core.type.classreading.MetadataReader#getClassMetadata()
  * @see AnnotationMetadata
- * 类的元数据: 一个类的各种特征属性
  */
 public interface ClassMetadata {
 
@@ -56,7 +55,9 @@ public interface ClassMetadata {
 	 * Return whether the underlying class represents a concrete class,
 	 * i.e. neither an interface nor an abstract class.
 	 */
-	boolean isConcrete();
+	default boolean isConcrete() {
+		return !(isInterface() || isAbstract());
+	}
 
 	/**
 	 * Return whether the underlying class is marked as 'final'.
@@ -77,7 +78,9 @@ public interface ClassMetadata {
 	 * <p>If this method returns {@code false}, then the underlying
 	 * class is a top-level class.
 	 */
-	boolean hasEnclosingClass();
+	default boolean hasEnclosingClass() {
+		return (getEnclosingClassName() != null);
+	}
 
 	/**
 	 * Return the name of the enclosing class of the underlying class,
@@ -89,7 +92,9 @@ public interface ClassMetadata {
 	/**
 	 * Return whether the underlying class has a super class.
 	 */
-	boolean hasSuperClass();
+	default boolean hasSuperClass() {
+		return (getSuperClassName() != null);
+	}
 
 	/**
 	 * Return the name of the super class of the underlying class,

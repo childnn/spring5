@@ -16,19 +16,19 @@
 
 package org.springframework.core.type.classreading;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+
 /**
- * Caching implementation of the {@link MetadataReaderFactory} interface,
- * caching a {@link MetadataReader} instance per Spring {@link Resource} handle
+ * Caching implementation of the {@link org.springframework.core.type.classreading.MetadataReaderFactory} interface,
+ * caching a {@link org.springframework.core.type.classreading.MetadataReader} instance per Spring {@link org.springframework.core.io.Resource} handle
  * (i.e. per ".class" file).
  *
  * @author Juergen Hoeller
@@ -65,11 +65,12 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	}
 
 	/**
-	 * Create a new CachingMetadataReaderFactory for the given {@link ResourceLoader},
+	 * Create a new CachingMetadataReaderFactory for the given {@link org.springframework.core.io.ResourceLoader},
 	 * using a shared resource cache if supported or a local resource cache otherwise.
+	 *
 	 * @param resourceLoader the Spring ResourceLoader to use
-	 * (also determines the ClassLoader to use)
-	 * @see DefaultResourceLoader#getResourceCache
+	 *                       (also determines the ClassLoader to use)
+	 * @see org.springframework.core.io.DefaultResourceLoader#getResourceCache
 	 */
 	public CachingMetadataReaderFactory(@Nullable ResourceLoader resourceLoader) {
 		super(resourceLoader);
@@ -87,7 +88,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	 * Specify the maximum number of entries for the MetadataReader cache.
 	 * <p>Default is 256 for a local cache, whereas a shared cache is
 	 * typically unbounded. This method enforces a local resource cache,
-	 * even if the {@link ResourceLoader} supports a shared resource cache.
+	 * even if the {@link org.springframework.core.io.ResourceLoader} supports a shared resource cache.
 	 */
 	public void setCacheLimit(int cacheLimit) {
 		if (cacheLimit <= 0) {
