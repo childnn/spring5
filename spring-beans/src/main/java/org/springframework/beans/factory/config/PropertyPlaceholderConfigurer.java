@@ -16,8 +16,6 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Properties;
-
 import org.springframework.beans.BeansException;
 import org.springframework.core.Constants;
 import org.springframework.core.SpringProperties;
@@ -26,6 +24,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.util.StringValueResolver;
+
+import java.util.Properties;
 
 /**
  * {@link PlaceholderConfigurerSupport} subclass that resolves ${...} placeholders against
@@ -48,6 +48,11 @@ import org.springframework.util.StringValueResolver;
  * of functionality may be maintained by continuing to use {@code PropertyPlaceholderConfigurer}.
  * </ul>
  *
+ * 应用场景:
+ *  1. the {@code spring-context} module 不在依赖范围内, 只有 spring-beans 依赖
+ *     spring-context 依赖 spring-beans.
+ *  2.
+ *
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 02.10.2003
@@ -55,6 +60,8 @@ import org.springframework.util.StringValueResolver;
  * @see PlaceholderConfigurerSupport
  * @see PropertyOverrideConfigurer
  * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+ * @see org.springframework.context.config.PropertyPlaceholderBeanDefinitionParser
+ * @see org.springframework.util.PropertyPlaceholderHelper
  */
 public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport {
 

@@ -89,6 +89,8 @@ import java.util.*;
  * @see java.lang.reflect.AnnotatedElement#getAnnotations()
  * @see java.lang.reflect.AnnotatedElement#getAnnotation(Class)
  * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
+ * 注解工具类
+ * @see AnnotatedElementUtils 注解标注的类的工具类
  */
 public abstract class AnnotationUtils {
 

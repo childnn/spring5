@@ -16,15 +16,16 @@
 
 package org.springframework.format;
 
-import java.lang.annotation.Annotation;
-
 import org.springframework.core.convert.converter.ConverterRegistry;
+
+import java.lang.annotation.Annotation;
 
 /**
  * A registry of field formatting logic.
  *
  * @author Keith Donald
  * @author Juergen Hoeller
+ * @see FormatterRegistrar
  * @since 3.0
  */
 public interface FormatterRegistry extends ConverterRegistry {

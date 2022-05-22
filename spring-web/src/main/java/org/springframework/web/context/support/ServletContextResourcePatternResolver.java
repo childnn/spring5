@@ -16,24 +16,22 @@
 
 package org.springframework.web.context.support;
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
+
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * ServletContext-aware subclass of {@link PathMatchingResourcePatternResolver},
@@ -160,20 +158,17 @@ public class ServletContextResourcePatternResolver extends PathMatchingResourceP
 			logger.debug("Searching jar file [" + jarFilePath + "] for entries matching [" + entryPattern + "]");
 		}
 		try {
-			JarFile jarFile = new JarFile(jarFilePath);
-			try {
-				for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
+			try (JarFile jarFile = new JarFile(jarFilePath)) {
+				for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
 					JarEntry entry = entries.nextElement();
 					String entryPath = entry.getName();
 					if (getPathMatcher().match(entryPattern, entryPath)) {
 						result.add(new UrlResource(
 								ResourceUtils.URL_PROTOCOL_JAR,
-								ResourceUtils.FILE_URL_PREFIX + jarFilePath + ResourceUtils.JAR_URL_SEPARATOR + entryPath));
+								ResourceUtils.FILE_URL_PREFIX + jarFilePath + ResourceUtils.JAR_URL_SEPARATOR +
+										entryPath));
 					}
 				}
-			}
-			finally {
-				jarFile.close();
 			}
 		}
 		catch (IOException ex) {

@@ -86,8 +86,9 @@ import java.util.stream.Collectors;
  * @since 4.0
  * @see AliasFor
  * @see AnnotationAttributes
- * @see AnnotationUtils
+ * @see AnnotationUtils 注解工具类
  * @see org.springframework.core.BridgeMethodResolver
+ * 注解标注的类的工具类
  */
 public abstract class AnnotatedElementUtils {
 

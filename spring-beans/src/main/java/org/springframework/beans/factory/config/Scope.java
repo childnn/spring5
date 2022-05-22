@@ -51,13 +51,45 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @since 2.0
- * @see ConfigurableBeanFactory#registerScope
+ * @see ConfigurableBeanFactory#registerScope 注册 scope
  * @see CustomScopeConfigurer
  * @see org.springframework.aop.scope.ScopedProxyFactoryBean
  * @see org.springframework.web.context.request.RequestScope
  * @see org.springframework.web.context.request.SessionScope
+ * @see CustomScopeConfigurer 注册 scope
  */
 public interface Scope {
+
+	default CustomScopeConfigurer custScope() {
+		CustomScopeConfigurer customScopeConfigurer = new CustomScopeConfigurer();
+		customScopeConfigurer.addScope("test", new Scope() {
+			@Override
+			public Object get(String name, ObjectFactory<?> objectFactory) {
+				return null;
+			}
+
+			@Override
+			public Object remove(String name) {
+				return null;
+			}
+
+			@Override
+			public void registerDestructionCallback(String name, Runnable callback) {
+
+			}
+
+			@Override
+			public Object resolveContextualObject(String key) {
+				return null;
+			}
+
+			@Override
+			public String getConversationId() {
+				return null;
+			}
+		});
+		return customScopeConfigurer;
+	}
 
 	/**
 	 * Return the object with the given name from the underlying scope,

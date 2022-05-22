@@ -17,7 +17,6 @@
 package org.springframework.aop.framework;
 
 import org.aopalliance.aop.Advice;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.aop.TargetSource;
@@ -34,8 +33,26 @@ import org.springframework.aop.TargetSource;
  * @author Juergen Hoeller
  * @since 13.03.2003
  * @see org.springframework.aop.framework.AdvisedSupport
+ * @see #getAdvisors()
+ * @see #addAdvice
+ * @see #addAdvisor
  */
 public interface Advised extends TargetClassAware {
+
+	// The getAdvisors() method returns an Advisor for every advisor, interceptor, or other advice type that has been added to the factory.
+	// If you added an Advisor, the returned advisor at this index is the object that you added.
+	// If you added an interceptor or other advice type, Spring wrapped this in an advisor with a pointcut that always returns true.
+	// Thus, if you added a MethodInterceptor, the advisor returned for this index is a DefaultPointcutAdvisor
+	// that returns your MethodInterceptor and a pointcut that matches all classes and methods.
+
+	// The addAdvisor() methods can be used to add any Advisor.
+	// Usually, the advisor holding pointcut and advice is the generic DefaultPointcutAdvisor,
+	// which you can use with any advice or pointcut (but not for introductions).
+
+	// By default, it is possible to add or remove advisors or interceptors even once a proxy has been created.
+	// The only restriction is that it is impossible to add or remove an introduction advisor,
+	// as existing proxies from the factory do not show the interface change.
+	// (You can obtain a new proxy from the factory to avoid this problem.)
 
 	/**
 	 * Return whether the Advised configuration is frozen,

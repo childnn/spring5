@@ -1,0 +1,21 @@
+
+The default ResourceLoader in any standard ApplicationContext is in fact an instance of
+PathMatchingResourcePatternResolver which implements the ResourcePatternResolver interface.
+The same is true for the ApplicationContext instance itself which also
+implements the ResourcePatternResolver interface and delegates to the default
+PathMatchingResourcePatternResolver.
+--
+默认使用的就是 PathMatchingResourcePatternResolver
+org.springframework.context.support.AbstractApplicationContext#getResourcePatternResolver
+--
+all application contexts in Spring implement the ResourceLoader interface.
+实现 ApplicationContextAware 也可以间接获取到 ResourceLoader, 但是不建议
+Since an ApplicationContext is a ResourceLoader, the bean could also implement
+the ApplicationContextAware interface and use the supplied application context directly to load resources.
+However, in general, it is better to use the specialized ResourceLoader interface if that is all you need.
+The code would be coupled only to the resource loading interface (which can be considered a
+utility interface) and not to the whole Spring ApplicationContext interface.
+--
+To load one or more Resource objects for a resource path that contains wildcards or
+makes use of the special classpath*: resource prefix, consider having an instance of
+ResourcePatternResolver autowired into your application components instead of ResourceLoader.

@@ -62,6 +62,7 @@ package org.springframework.validation;
  * @see SmartValidator
  * @see Errors
  * @see ValidationUtils
+ * @see MessageCodesResolver
  */
 public interface Validator {
 

@@ -31,6 +31,15 @@ package org.springframework.beans.factory;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
+ * @see org.springframework.context.ResourceLoaderAware
+ * @see org.springframework.beans.factory.BeanFactoryAware
+ * @see org.springframework.beans.factory.BeanNameAware
+ * @see org.springframework.beans.factory.BeanClassLoaderAware
+ * @see org.springframework.context.ApplicationContextAware
+ * @see org.springframework.context.EnvironmentAware
+ * @see org.springframework.context.MessageSourceAware
+ * @see org.springframework.context.ApplicationEventPublisherAware
+ * @see org.springframework.context.support.ApplicationContextAwareProcessor#invokeAwareInterfaces(Object)
  */
 public interface Aware {
 

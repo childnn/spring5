@@ -31,6 +31,7 @@ import org.springframework.lang.Nullable;
  * @see ObjectError
  * @see FieldError
  * @see org.springframework.context.MessageSourceResolvable#getCodes()
+ * @see Validator
  */
 public interface MessageCodesResolver {
 

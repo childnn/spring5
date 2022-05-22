@@ -31,4 +31,13 @@ import org.aopalliance.intercept.MethodInterceptor;
  */
 public interface IntroductionInterceptor extends MethodInterceptor, DynamicIntroductionAdvice {
 
+	// Spring treats introduction advice as a special kind of interception advice.
+
+	// The invoke() method inherited from the AOP Alliance MethodInterceptor interface must implement the introduction.
+	// That is, if the invoked method is on an introduced interface,
+	// the introduction interceptor is responsible for handling the method call—it cannot invoke proceed().
+
+	// Introduction advice cannot be used with any pointcut, as it applies only at the class, rather than the method, level.
+	// You can only use introduction advice with the IntroductionAdvisor
+
 }

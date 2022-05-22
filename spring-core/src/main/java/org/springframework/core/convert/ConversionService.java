@@ -25,6 +25,8 @@ import org.springframework.lang.Nullable;
  * @author Keith Donald
  * @author Phillip Webb
  * @since 3.0
+ * A ConversionService is a stateless object designed to be instantiated at
+ * application startup and then shared between multiple threads.
  */
 public interface ConversionService {
 

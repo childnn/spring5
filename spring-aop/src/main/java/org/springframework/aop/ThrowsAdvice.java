@@ -50,4 +50,24 @@ package org.springframework.aop;
  */
 public interface ThrowsAdvice extends AfterAdvice {
 
+	// Throws advice can be used with any pointcut.
+
+	//  It is a tag interface identifying that the given object implements one or more typed throws advice methods.
+	//  These should be in the following form:
+	//
+	// Only the last argument is required. The method signatures may have either one or four arguments,
+	// depending on whether the advice method is interested in the method and arguments.
+
+	/*
+		If a throws-advice method throws an exception itself, it overrides the original exception (that is, it changes the exception thrown to the user).
+		The overriding exception is typically a RuntimeException, which is compatible with any method signature.
+		However, if a throws-advice method throws a checked exception, it must match the declared exceptions of the target method and is,
+		hence, to some degree coupled to specific target method signatures.
+		Do not throw an undeclared checked exception that is incompatible with the target method’s signature!
+
+	 */
+
+	// example: 只有 subclassOfThrowable 这个参数是必须的
+	// afterThrowing([Method, args, target], subclassOfThrowable)
+
 }

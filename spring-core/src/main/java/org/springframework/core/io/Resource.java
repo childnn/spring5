@@ -16,6 +16,8 @@
 
 package org.springframework.core.io;
 
+import org.springframework.lang.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +25,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Interface for a resource descriptor that abstracts from the actual
@@ -43,11 +43,27 @@ import org.springframework.lang.Nullable;
  * @see WritableResource
  * @see ContextResource
  * @see UrlResource
+ *    		     UrlResource wraps a java.net.URL and can be used to access any object that is normally accessible with a URL,
+ * 				 such as files, an HTTPS target, an FTP target, and others.
+ * 				 This includes
+ * 				 file: for accessing filesystem paths,
+ * 				 https: for accessing resources through the HTTPS protocol,
+ * 				 ftp: for accessing resources through FTP, and others.
  * @see FileUrlResource
  * @see FileSystemResource
  * @see ClassPathResource
  * @see ByteArrayResource
- * @see InputStreamResource
+ * @see InputStreamResource  is a Resource implementation for a given InputStream.
+ * 							It should be used only if no specific Resource implementation is applicable.
+ * 							In particular, prefer ByteArrayResource or any of the file-based Resource implementations where possible.
+ * 						In contrast to other Resource implementations, this is a descriptor for an already-opened resource. Therefore,
+ * 						it returns true from isOpen(). Do not use it if you need to keep the resource descriptor somewhere
+ * 						or if you need to read a stream multiple times.
+ * @see PathResource This is a Resource implementation for java.nio.file.Path handles, performing all operations
+ * 					and transformations via the Path API. It supports resolution as a File and as a URL and also implements
+ * 					the extended WritableResource interface.
+ * 					PathResource is effectively a pure java.nio.path.Path based alternative to
+ * 					FileSystemResource with different createRelative behavior.
  */
 public interface Resource extends InputStreamSource {
 

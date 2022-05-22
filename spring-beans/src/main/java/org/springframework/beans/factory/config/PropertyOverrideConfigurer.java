@@ -16,15 +16,15 @@
 
 package org.springframework.beans.factory.config;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.BeanInitializationException;
+
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.BeanInitializationException;
 
 /**
  * Property resource configurer that overrides bean property values in an application
@@ -49,6 +49,7 @@ import org.springframework.beans.factory.BeanInitializationException;
  * they are not translated into bean references. This also applies when the original
  * value in the XML bean definition specifies a bean reference.
  *
+ * -- 多个 PropertyOverrideConfigurer 实例, 最后一个有效
  * <p>In case of multiple PropertyOverrideConfigurers that define different values for
  * the same bean property, the <i>last</i> one will win (due to the overriding mechanism).
  *
@@ -61,6 +62,11 @@ import org.springframework.beans.factory.BeanInitializationException;
  * @since 12.03.2003
  * @see #convertPropertyValue
  * @see PropertyPlaceholderConfigurer
+ *
+ * -- 简单字面量
+ * Specified override values are always literal values. They are not translated into bean references.
+ * This convention also applies when the original value in the XML bean definition specifies a bean reference.
+ *
  */
 public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 

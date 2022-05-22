@@ -53,6 +53,7 @@ import java.util.Map;
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @since 1.4.0
+ * 视图解析器
  */
 public class DefaultErrorViewResolver implements ErrorViewResolver, Ordered {
 

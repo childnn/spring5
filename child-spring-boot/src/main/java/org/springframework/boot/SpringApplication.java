@@ -205,6 +205,7 @@ public class SpringApplication {
 	 * @param primarySources the primary bean sources
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
+	 * @see #applyInitializers
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
@@ -256,8 +257,17 @@ public class SpringApplication {
 			Banner printedBanner = printBanner(environment);
 			context = createApplicationContext();
 			// context.setApplicationStartup(this.applicationStartup);
+
+			// 1. #applyInitializers
+			// 2. listeners.contextPrepared
+			// 3. #load
+			// 4. listeners.contextLoaded
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+
+			// refresh
+			// org.springframework.context.support.AbstractApplicationContext.refresh
 			refreshContext(context);
+
 			afterRefresh(context, applicationArguments);
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
 			if (this.logStartupInfo) {

@@ -16,15 +16,14 @@
 
 package org.springframework.core;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.lang.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Static holder for local Spring properties, i.e. defined at the Spring library level.
@@ -62,12 +61,8 @@ public final class SpringProperties {
 					ClassLoader.getSystemResource(PROPERTIES_RESOURCE_LOCATION));
 			if (url != null) {
 				logger.debug("Found 'spring.properties' file in local classpath");
-				InputStream is = url.openStream();
-				try {
+				try (InputStream is = url.openStream()) {
 					localProperties.load(is);
-				}
-				finally {
-					is.close();
 				}
 			}
 		}

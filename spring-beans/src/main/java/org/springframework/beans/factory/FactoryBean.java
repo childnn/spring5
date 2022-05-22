@@ -55,6 +55,10 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
+ *
+ * #getBean("beanName") 获取 factory bean 构建的对象
+ * #getBean("&beanName") 获取 factory bean 实例本身
+ *
  */
 public interface FactoryBean<T> {
 

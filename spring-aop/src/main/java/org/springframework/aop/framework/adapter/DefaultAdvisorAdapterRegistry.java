@@ -16,15 +16,14 @@
 
 package org.springframework.aop.framework.adapter;
 
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.aopalliance.aop.Advice;
-import org.aopalliance.intercept.MethodInterceptor;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
 
 /**
  * Default implementation of the {@link AdvisorAdapterRegistry} interface.
@@ -45,10 +44,17 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 
 	/**
 	 * Create a new DefaultAdvisorAdapterRegistry, registering well-known adapters.
+	 *
+	 * @see org.aspectj.lang.annotation.Before
+	 * @see org.aspectj.lang.annotation.AfterReturning
+	 * @see org.aspectj.lang.annotation.AfterThrowing
 	 */
 	public DefaultAdvisorAdapterRegistry() {
+		// before advice
 		registerAdvisorAdapter(new MethodBeforeAdviceAdapter());
+		// after returning
 		registerAdvisorAdapter(new AfterReturningAdviceAdapter());
+		// after throwing
 		registerAdvisorAdapter(new ThrowsAdviceAdapter());
 	}
 
@@ -75,6 +81,12 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		throw new UnknownAdviceTypeException(advice);
 	}
 
+	/**
+	 * @param advisor the Advisor to find an interceptor for
+	 * @return MethodInterceptors
+	 * @see AfterReturningAdviceAdapter#getInterceptor(org.springframework.aop.Advisor)
+	 * @see MethodBeforeAdviceAdapter#getInterceptor
+	 */
 	@Override
 	public MethodInterceptor[] getInterceptors(Advisor advisor) throws UnknownAdviceTypeException {
 		List<MethodInterceptor> interceptors = new ArrayList<>(3);

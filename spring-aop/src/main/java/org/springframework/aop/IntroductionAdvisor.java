@@ -31,11 +31,19 @@ package org.springframework.aop;
  */
 public interface IntroductionAdvisor extends Advisor, IntroductionInfo {
 
+	// There is no MethodMatcher and, hence, no Pointcut associated with introduction advice. Only class filtering is logical.
+	//
+	// The IntroductionInfo#getInterfaces() method returns the interfaces introduced by this advisor.
+
+	// The validateInterfaces() method is used internally to see whether or not the introduced interfaces
+	// can be implemented by the configured IntroductionInterceptor.
+
 	/**
 	 * Return the filter determining which target classes this introduction
 	 * should apply to.
 	 * <p>This represents the class part of a pointcut. Note that method
 	 * matching doesn't make sense to introductions.
+	 *
 	 * @return the class filter
 	 */
 	ClassFilter getClassFilter();

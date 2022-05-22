@@ -29,4 +29,6 @@ import org.aopalliance.aop.Advice;
  */
 public interface BeforeAdvice extends Advice {
 
+	// Before advice can be used with any pointcut.
+
 }

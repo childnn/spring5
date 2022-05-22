@@ -16,14 +16,14 @@
 
 package org.springframework.core.convert.support;
 
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.ConverterRegistry;
+import org.springframework.lang.Nullable;
+
 import java.nio.charset.Charset;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.UUID;
-
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.lang.Nullable;
 
 /**
  * A specialization of {@link GenericConversionService} configured by default
@@ -61,7 +61,10 @@ public class DefaultConversionService extends GenericConversionService {
 	 * This accessor is only meant as a fallback for code paths which
 	 * need simple type coercion but cannot access a longer-lived
 	 * {@code ConversionService} instance any other way.
+	 *
 	 * @return the shared {@code ConversionService} instance (never {@code null})
+	 * @see org.springframework.context.support.ConversionServiceFactoryBean
+	 * @see org.springframework.format.support.FormattingConversionServiceFactoryBean
 	 * @since 4.3.5
 	 */
 	public static ConversionService getSharedInstance() {

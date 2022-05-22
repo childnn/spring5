@@ -72,6 +72,7 @@ class ServletComponentRegisteringPostProcessor implements BeanFactoryPostProcess
 
 	private void scanPackage(ClassPathScanningCandidateComponentProvider componentProvider, String packageToScan) {
 		for (BeanDefinition candidate : componentProvider.findCandidateComponents(packageToScan)) {
+			// 只处理注解标注的 BD
 			if (candidate instanceof AnnotatedBeanDefinition) {
 				for (ServletComponentHandler handler : HANDLERS) {
 					handler.handle(((AnnotatedBeanDefinition) candidate),

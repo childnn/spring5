@@ -115,6 +115,9 @@ import java.util.function.Consumer;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class})
+// 如果没有 WebMvcConfigurationSupport
+// org.springframework.web.servlet.config.annotation.EnableWebMvc--导入的 org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
+// 这里默认使用的是 org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.EnableWebMvcConfiguration
 @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
 @AutoConfigureAfter({DispatcherServletAutoConfiguration.class, TaskExecutionAutoConfiguration.class,

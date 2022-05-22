@@ -26,7 +26,8 @@ dependencies {
     // optional("org.springframework:spring-webflux")
     // optional("org.springframework:spring-webmvc")
 
-    compile("javax.validation:validation-api:1.1.0.Final")
+    // compile("javax.validation:validation-api:1.1.0.Final")
+    compile("javax.validation:validation-api:2.0.1.Final")
     compile 'javax.servlet:javax.servlet-api:4.0.1'
     compile("org.apache.tomcat.embed:tomcat-embed-core:9.0.60") {
         exclude group: "org.apache.tomcat", module: "tomcat-annotations-api"

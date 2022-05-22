@@ -22,6 +22,7 @@ import org.springframework.core.convert.converter.Converter;
  * a FormattingConversionService through the {@link FormatterRegistry} SPI.
  *
  * @author Keith Donald
+ * @see FormatterRegistry
  * @since 3.1
  */
 public interface FormatterRegistrar {
