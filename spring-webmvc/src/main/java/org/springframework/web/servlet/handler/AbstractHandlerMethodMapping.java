@@ -158,6 +158,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param mapping the mapping for the handler method
 	 * @param handler the handler
 	 * @param method the method
+	 * @see #registerHandlerMethod
 	 */
 	public void registerMapping(T mapping, Object handler, Method method) {
 		if (logger.isTraceEnabled()) {
@@ -300,6 +301,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param mapping the mapping conditions associated with the handler method
 	 * @throws IllegalStateException if another method was already registered
 	 * under the same mapping
+	 * @see #registerMapping(Object, Object, java.lang.reflect.Method)
 	 */
 	protected void registerHandlerMethod(Object handler, Method method, T mapping) {
 		this.mappingRegistry.register(mapping, handler, method);

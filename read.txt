@@ -1,3 +1,0 @@
-修改: gradle/docs.gradle
-gradle 版本修改: gradle/wrapper/gradle-wrapper.properties
-优先编译: spring-oxm  $ ./gradlew :spring-oxm:compileTestJava

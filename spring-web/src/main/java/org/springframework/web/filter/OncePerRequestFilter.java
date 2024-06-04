@@ -16,19 +16,14 @@
 
 package org.springframework.web.filter;
 
-import java.io.IOException;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.web.context.request.async.WebAsyncManager;
 import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Filter base class that aims to guarantee a single execution per request
@@ -97,6 +92,7 @@ public abstract class OncePerRequestFilter extends GenericFilterBean {
 		String alreadyFilteredAttributeName = getAlreadyFilteredAttributeName();
 		boolean hasAlreadyFilteredAttribute = request.getAttribute(alreadyFilteredAttributeName) != null;
 
+		// org.springframework.web.filter.ForwardedHeaderFilter.FORWARDED_HEADER_NAMES
 		if (skipDispatch(httpRequest) || shouldNotFilter(httpRequest)) {
 
 			// Proceed without invoking this filter...

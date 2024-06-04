@@ -22,10 +22,15 @@ import java.util.Map;
  */
 public class ChildPropertyEditorConfig extends CustomEditorConfigurer {
 
+	public ChildPropertyEditorConfig() {
+		System.out.println(getClass().getName() + "----init....");
+	}
+
 	public static class ChildDateEditor extends CustomDateEditor {
 
 		public ChildDateEditor() {
 			super(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true);
+			System.out.println(getClass().getName() + "----init....");
 		}
 	}
 

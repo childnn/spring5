@@ -1008,6 +1008,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpServletRequest processedRequest = request;
+		// HandlerExecutionChain 封装 handler 和 HandlerInterceptors
 		HandlerExecutionChain mappedHandler = null;
 		boolean multipartRequestParsed = false;
 
@@ -1018,6 +1019,11 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
+				// 处理 multipart -- 文件请求
+				// org.springframework.web.multipart.MultipartResolver
+				// 目前两个实现: apache-commons; servlet-3.0 Part
+				// 具体使用方式可以参考 类文档, spring-官方文档, 源码
+				// https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-handlermapping-path
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
@@ -1025,13 +1031,34 @@ public class DispatcherServlet extends FrameworkServlet {
 				// Determine handler for the current request.
 				mappedHandler = getHandler(processedRequest); // HandlerExecutionChain: handler and interceptors
 				if (mappedHandler == null) {
+					// 如果没有找到 handler 则根据配置抛出异常或者返回 404
+					// javax.servlet.http.HttpServletResponse.SC_NOT_FOUND
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
+				/**
+				 * ~~ Talk is cheap. Show me the code. ~~ :-)
+				 *
+				 * @author MiaoOne
+				 * @since 2024/4/15
+				 * @see org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping 注册 handler-mapping, form url to handler.
+				 * @see com.jxtech.jxudp.controller.WebExportControl handler, a HttpRequestHandler
+				 * @see org.springframework.web.servlet.handler.AbstractHandlerMapping#initApplicationContext init HandlerInterceptor
+				 *
+				 * handler chain: handler + interceptors
+				 * handler adapter: for object-handler,  This interface is used to allow the DispatcherServlet to be indefinitely extensible.
+				 * @see org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter is a handler adapter for {@link com.jxtech.jxudp.controller.WebExportControl}
+				 * --
+				 * @see org.springframework.web.servlet.DispatcherServlet#processDispatchResult 结果处理
+				 *
+				 */
+
 				// 根据不同的 Handler 类型(如 HandlerMethod, Servlet)获取 处理器适配器
+				// org.springframework.web.servlet.HandlerAdapter#supports
 				// Determine handler adapter for the current request.
-				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler()); // 此处的 handler 就是 HandlerMethod
+				// org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
+				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler()); // 此处的 mappedHandler.getHandler() 就是 HandlerMethod
 
 				// Process last-modified header, if supported by the handler.
 				String method = request.getMethod();
@@ -1043,6 +1070,9 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				// 如果 HandlerInterceptor#preHandle 返回 false 则不处理
+				// 详细查阅 HandlerInterceptor 文档
+				// HandlerInterceptor is basically similar to a Servlet Filter
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) { // HandlerInterceptors
 					return;
 				}
@@ -1056,6 +1086,8 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				applyDefaultViewName(processedRequest, mv);
+
+				// 调用 HandlerInterceptor#postHandle
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {

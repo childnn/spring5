@@ -509,6 +509,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 
 	/**
+	 * 注: 这个方法是 servlet 的方法, 是每一次请求调用一次, 而不是服务启动时调用
 	 * Overridden method of {@link HttpServletBean}, invoked after any bean properties
 	 * have been set. Creates this servlet's WebApplicationContext.
 	 */
@@ -523,6 +524,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// web-app: servlet 是每一次请求都会调用
 			this.webApplicationContext = initWebApplicationContext(); // IoC, AOP
 			initFrameworkServlet(); // empty default
 		}
@@ -540,7 +542,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Completed initialization in " + (System.currentTimeMillis() - startTime) + " ms");
+			logger.info("FrameworkServlet----Completed initialization in " + (System.currentTimeMillis() - startTime) + " ms");
 		}
 	}
 

@@ -17,7 +17,6 @@
 package org.springframework.transaction.aspectj;
 
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Concrete AspectJ transaction aspect using Spring's
@@ -47,6 +46,7 @@ public aspect AnnotationTransactionAspect extends AbstractTransactionAspect {
 
 	public AnnotationTransactionAspect() {
 		super(new AnnotationTransactionAttributeSource(false));
+        // AnnotationTransactionAspect ata = AnnotationTransactionAspect.aspectOf(); // aspect 静态方法
 	}
 
 	/**

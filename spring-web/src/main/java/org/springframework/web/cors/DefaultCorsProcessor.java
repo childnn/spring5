@@ -16,18 +16,8 @@
 
 package org.springframework.web.cors;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -38,6 +28,14 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The default implementation of {@link CorsProcessor}, as defined by the
@@ -126,12 +124,14 @@ public class DefaultCorsProcessor implements CorsProcessor {
 		responseHeaders.addAll(HttpHeaders.VARY, Arrays.asList(HttpHeaders.ORIGIN,
 				HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS));
 
+		//
 		if (allowOrigin == null) {
 			logger.debug("Reject: '" + requestOrigin + "' origin is not allowed");
 			rejectRequest(response);
 			return false;
 		}
 
+		// method
 		HttpMethod requestMethod = getMethodToUse(request, preFlightRequest);
 		List<HttpMethod> allowMethods = checkMethods(config, requestMethod);
 		if (allowMethods == null) {
@@ -140,6 +140,7 @@ public class DefaultCorsProcessor implements CorsProcessor {
 			return false;
 		}
 
+		// headers
 		List<String> requestHeaders = getHeadersToUse(request, preFlightRequest);
 		List<String> allowHeaders = checkHeaders(config, requestHeaders);
 		if (preFlightRequest && allowHeaders == null) {

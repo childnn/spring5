@@ -57,6 +57,8 @@ class ServletWebServerFactoryConfiguration {
 
 		@Bean
 		TomcatServletWebServerFactory tomcatServletWebServerFactory(
+				// ObjectProvider 表示有则注入, 没有不会报错
+				// 并且 ObjectProvider 继承 Iterable, 可以注入多个
 				ObjectProvider<TomcatConnectorCustomizer> connectorCustomizers,
 				ObjectProvider<TomcatContextCustomizer> contextCustomizers,
 				ObjectProvider<TomcatProtocolHandlerCustomizer<?>> protocolHandlerCustomizers) {

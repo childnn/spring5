@@ -199,6 +199,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
 			// StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
+			// org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
 			ServletWebServerFactory factory = getWebServerFactory();
 			// createWebServer.tag("factory", factory.getClass().toString());
 			this.webServer = factory.getWebServer(getSelfInitializer());
@@ -223,6 +224,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 * the context itself.
 	 *
 	 * @return a {@link ServletWebServerFactory} (never {@code null})
+	 * @see org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory#getWebServer 
 	 */
 	protected ServletWebServerFactory getWebServerFactory() {
 		// Use bean names so that we don't consider the hierarchy
@@ -253,6 +255,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		prepareWebApplicationContext(servletContext);
 		registerApplicationScope(servletContext);
 		WebApplicationContextUtils.registerEnvironmentBeans(getBeanFactory(), servletContext);
+		// 从 web-ioc 中获取 ServletContextInitializer-beans
 		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {
 			beans.onStartup(servletContext);
 		}

@@ -42,6 +42,7 @@ import java.util.function.Supplier;
  * @author Phillip Webb
  * @see BootstrapContext
  * @see ConfigurableBootstrapContext
+ * @see org.springframework.boot.DefaultBootstrapContext
  * @since 2.4.0
  */
 public interface BootstrapRegistry {

@@ -16,6 +16,7 @@
 
 package org.springframework.boot.web.embedded.tomcat;
 
+// servlet-4.*
 // import jakarta.servlet.ServletContainerInitializer;
 
 // import jakarta.servlet.http.Cookie;
@@ -85,6 +86,7 @@ import java.util.stream.Collectors;
  * @see #setContextLifecycleListeners(Collection)
  * @see TomcatWebServer
  * @since 2.0.0
+ * @see org.springframework.boot.web.server.WebServerFactoryCustomizerBeanPostProcessor#postProcessBeforeInitialization(Object, String)
  */
 public class TomcatServletWebServerFactory extends AbstractServletWebServerFactory
 		implements ConfigurableTomcatWebServerFactory, ResourceLoaderAware {
@@ -356,6 +358,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
+		// tomcat -> host -> context -> starter
 		Tomcat tomcat = new Tomcat();
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
@@ -369,6 +372,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+		// !!! add context to tomcat-host
 		prepareContext(tomcat.getHost(), initializers);
 		return getTomcatWebServer(tomcat);
 	}
@@ -415,7 +419,11 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
+
+		// add context to tomcat-host
 		host.addChild(context);
+
+		// !!! set tomcat-starter
 		configureContext(context, initializersToUse);
 		postProcessContext(context);
 	}
@@ -531,13 +539,17 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * @param initializers initializers to apply
 	 */
 	protected void configureContext(Context context, ServletContextInitializer[] initializers) {
+		// TomcatStarter 是一个 ServletContainerInitializer,
 		TomcatStarter starter = new TomcatStarter(initializers);
 		if (context instanceof TomcatEmbeddedContext) {
 			TomcatEmbeddedContext embeddedContext = (TomcatEmbeddedContext) context;
 			embeddedContext.setStarter(starter);
 			embeddedContext.setFailCtxIfServletStartFails(true);
 		}
+		// 加入到 servlet 容器, 通过容器初始化 ServletContainerInitializer
+		// org.apache.catalina.startup.ContextConfig#webConfig 加载 SCIs
 		context.addServletContainerInitializer(starter, NO_CLASSES);
+
 		for (LifecycleListener lifecycleListener : this.contextLifecycleListeners) {
 			context.addLifecycleListener(lifecycleListener);
 		}
@@ -560,6 +572,11 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (String webListenerClassName : getWebListenerClassNames()) {
 			context.addApplicationListener(webListenerClassName);
 		}
+
+		// TomcatContextCustomizer: 自定义 tomcat-context
+		// 如何加入到该集合?
+		// org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryConfiguration.EmbeddedTomcat.tomcatServletWebServerFactory
+		// org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getTomcatContextCustomizers
 		for (TomcatContextCustomizer customizer : this.tomcatContextCustomizers) {
 			customizer.customize(context);
 		}

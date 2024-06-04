@@ -37,7 +37,7 @@ public class LockMixinAdvisor extends DefaultIntroductionAdvisor {
 		// prototype
 		this(new LockMixin(true));
 		// super(new LockMixin(true), Lockable.class);
-		System.out.println("serialVersionUID = " + serialVersionUID);
+		System.out.println("LockMixinAdvisor = " + this);
 	}
 
 	public LockMixinAdvisor(LockMixin lockMixin) {

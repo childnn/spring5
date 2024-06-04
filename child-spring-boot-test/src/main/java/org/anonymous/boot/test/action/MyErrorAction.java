@@ -21,6 +21,10 @@ import java.util.List;
  * @see org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver#afterPropertiesSet()
  * @see org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor
  * @since 2022/04/23
+ * 错误之后如何重定向到 /error
+ * @see org.apache.catalina.core.StandardHostValve#custom(org.apache.catalina.connector.Request, org.apache.catalina.connector.Response, org.apache.tomcat.util.descriptor.web.ErrorPage)
+ * @see org.springframework.boot.autoconfigure.web.ServerProperties#getError()
+ * @see javax.servlet.RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
  */
 @Controller
 public class MyErrorAction extends AbstractErrorController {

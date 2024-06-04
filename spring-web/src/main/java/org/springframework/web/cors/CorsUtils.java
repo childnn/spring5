@@ -16,10 +16,10 @@
 
 package org.springframework.web.cors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Utility class for CORS request handling based on the
@@ -38,6 +38,10 @@ public abstract class CorsUtils {
 	}
 
 	/**
+	 * 跨域预检
+	 * <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-requestmapping-composed">...</a>
+	 * http://www.ruanyifeng.com/blog/2016/04/cors.html
+	 * <a href="https://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html">...</a>
 	 * Returns {@code true} if the request is a valid CORS pre-flight one.
 	 */
 	public static boolean isPreFlightRequest(HttpServletRequest request) {

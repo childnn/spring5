@@ -8,6 +8,15 @@ package org.anonymous.boot.test.model;
  */
 public class Response<T> {
 
+
+	public Response() {
+	}
+
+	public Response(String msg, T content) {
+		this.msg = msg;
+		this.content = content;
+	}
+
 	private String msg;
 
 	private T content;

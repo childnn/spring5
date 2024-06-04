@@ -3,6 +3,7 @@ package org.anonymous.boot.test.action;
 import org.anonymous.boot.test.annotation.Free;
 import org.anonymous.boot.test.model.DateModel;
 import org.anonymous.boot.test.model.Response;
+import org.springframework.stereotype.Indexed;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author MiaoOne
  * @since 2022/05/04
  */
+@Indexed
 @Free
 @RestController
 public class DateAction {
@@ -22,7 +24,12 @@ public class DateAction {
 		Response<DateModel> resp = new Response<>();
 		resp.setContent(dateModel);
 		resp.setMsg("aaaa");
+		extracted();
 		return resp;
+	}
+
+	private void extracted() {
+		throw new RuntimeException("");
 	}
 
 }

@@ -66,7 +66,6 @@ public class RequestListener implements ServletRequestListener, BeanFactoryAware
 		// 	System.out.println("requestScope = " + requestScope);
 		// });
 	}
-
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 		System.out.println("beanFactory = " + beanFactory);
@@ -74,9 +73,9 @@ public class RequestListener implements ServletRequestListener, BeanFactoryAware
 			this.configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
 		}
 	}
-
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		System.out.println("applicationContext = " + applicationContext);
 	}
+
 }

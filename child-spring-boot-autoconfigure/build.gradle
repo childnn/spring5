@@ -17,6 +17,6 @@ dependencies {
 //	optional("org.springframework.data:spring-data-jdbc")
 }
 
-tasks.getByName<Test>("test") {
+test/*tasks.getByName<Test>("test")*/ {
 	useJUnitPlatform()
 }

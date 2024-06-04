@@ -1,0 +1,4 @@
+org.springframework.context.ApplicationContextInitializer=\
+  org.anonymous.boot.test.config.ChildApplicationContextInitializer
+org.springframework.boot.BootstrapRegistryInitializer=\
+  org.anonymous.boot.test.config.base.ChildBootstrapRegistryInitializer

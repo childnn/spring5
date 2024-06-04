@@ -74,7 +74,7 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		addServletContextInitializerBeans(beanFactory);
 		addAdaptableBeans(beanFactory);
 		List<ServletContextInitializer> sortedInitializers = this.initializers.values().stream()
-				.flatMap((value) -> value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
+				.flatMap(value -> value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
 				.collect(Collectors.toList());
 		this.sortedList = Collections.unmodifiableList(sortedInitializers);
 		logMappings(this.initializers);

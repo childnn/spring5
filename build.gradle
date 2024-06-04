@@ -1,8 +1,10 @@
 buildscript {
     repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://repo.spring.io/plugins-release" }
         maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
         maven { url "http://maven.aliyun.com/nexus/content/repositories/jcenter" }
-        maven { url "https://repo.spring.io/plugins-release" }
     }
     dependencies {
         classpath("io.spring.gradle:propdeps-plugin:0.0.9.RELEASE")
@@ -57,7 +59,8 @@ ext {
     rxjava2Version = "2.2.17"
     slf4jVersion = "1.7.30"      // spring-jcl + consistent 3rd party deps
     tiles3Version = "3.0.8"
-    tomcatVersion = "9.0.30"
+    // tomcatVersion = "9.0.30"
+    tomcatVersion = "9.0.60"
     undertowVersion = "2.0.29.Final"
 
     gradleScriptDir = "${rootProject.projectDir}/gradle"

@@ -206,6 +206,7 @@ public class SpringApplication {
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
 	 * @see #applyInitializers
+	 * @see org.springframework.core.io.support.SpringFactoriesLoader#FACTORIES_RESOURCE_LOCATION
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
@@ -215,10 +216,22 @@ public class SpringApplication {
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
-		// #applyInitializers
+
+		System.out.println("从 spring.factories 加载-org.springframework.context.ApplicationContextInitializer");
+
+		// load from /META-INF/spring.factories
+		// #applyInitializers: org.springframework.context.ApplicationContextInitializer
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+
+		System.out.println("从 spring.factories 加载-org.springframework.context.ApplicationContextInitializer-完成");
+
+		System.out.println("从 spring.factories 加载-org.springframework.context.ApplicationListener");
+
 		// org.springframework.boot.context.event.EventPublishingRunListener
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+
+		System.out.println("从 spring.factories 加载-org.springframework.context.ApplicationListener-完成");
+
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -327,6 +340,10 @@ public class SpringApplication {
 				deduceEnvironmentClass());
 	}
 
+	/**
+	 * @see WebApplicationType#deduceFromClasspath()
+	 * @return env class.
+	 */
 	private Class<? extends StandardEnvironment> deduceEnvironmentClass() {
 		switch (this.webApplicationType) {
 			case SERVLET:
@@ -423,6 +440,10 @@ public class SpringApplication {
 		return instances;
 	}
 
+	/**
+	 * @see WebApplicationType#deduceFromClasspath()
+	 * @return env entity.
+	 */
 	private ConfigurableEnvironment getOrCreateEnvironment() {
 		if (this.environment != null) {
 			return this.environment;

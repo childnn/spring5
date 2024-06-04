@@ -288,9 +288,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			bd.setScope(BeanDefinition.SCOPE_PROTOTYPE);
 			bd.allowCaching = ClassUtils.isCacheSafe(ClassUtils.getUserClass(existingBean), getBeanClassLoader());
 		}
+
+		// 封装 bean, 便于属性转化等
 		BeanWrapper bw = new BeanWrapperImpl(existingBean);
 		initBeanWrapper(bw);
 		populateBean(beanName, bd, bw); // 填充属性
+
+		// 属性填充之后, 执行初始化之后的逻辑: bean-post-processor, @PostConstruct, awares, InitializingBean#afterPropertiesSet()
 		return initializeBean(beanName, existingBean, bd);
 	}
 
@@ -367,6 +371,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object result = existingBean;
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
+			// org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+			// PostConstruct/Predestroy
 			Object current = processor.postProcessBeforeInitialization(result, beanName);
 			if (current == null) {
 				return result;
@@ -457,6 +463,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			// org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation
+			// 如果此处返回 nonnull, 多为代理对象, 直接返回, 之后的逻辑不会再走了
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;
@@ -1049,7 +1057,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
-					// org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization
+					// org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
 						// org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization
@@ -1362,6 +1370,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+					// 特殊属性注入
 					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						if (filteredPds == null) {
@@ -1709,11 +1718,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
 	protected Object initializeBean(final String beanName, final Object bean, @Nullable RootBeanDefinition mbd) {
+		// 以下流程可以说明, 如果 bean 中存在 @PostConstruct 方法, 且实现了 InitializingBean 接口
+		// 则会先执行 @PostConstruct 方法, 再执行 InitializingBean#afterPropertiesSet()
+
 		/*
 		  调用一系列回调方法
 		  1. 调用 #aware-methods
 		  2. 调用 org.springframework.beans.factory.config.BeanPostProcessor.postProcessBeforeInitialization
-		  3. 调用 init-methods
+		     - org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+		       解析 PostConstruct/Predestroy 注解
+		  3. 调用 init-methods -- InitializingBean
 		  4. 调用 org.springframework.beans.factory.config.BeanPostProcessor.postProcessAfterInitialization
 		 */
 
@@ -1733,6 +1747,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
 			// org.springframework.beans.factory.config.BeanPostProcessor.postProcessBeforeInitialization
+			// CommonAnnotationBeanPostProcessor: PostConstruct/Predestroy
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 

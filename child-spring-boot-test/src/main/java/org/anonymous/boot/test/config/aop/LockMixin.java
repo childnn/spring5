@@ -44,8 +44,6 @@ public class LockMixin extends DelegatingIntroductionInterceptor implements Lock
 	 so we do not need to specify that. We could introduce any number of interfaces in this way.
 
 	  Note the use of the locked instance variable. This effectively adds additional state to that held in the target object.
-
-
 	 */
 
 	private boolean locked;

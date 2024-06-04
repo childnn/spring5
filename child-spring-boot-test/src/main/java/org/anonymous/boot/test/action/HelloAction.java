@@ -26,7 +26,7 @@ public class HelloAction {
 	 * @see RequestAttributes#SCOPE_REQUEST
 	 * @see org.springframework.web.context.WebApplicationContext#SCOPE_REQUEST
 	 */
-	@GetMapping
+	@GetMapping("/")
 	String hello() {
 		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 		if (requestAttributes instanceof ServletRequestAttributes) {

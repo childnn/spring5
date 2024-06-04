@@ -39,6 +39,10 @@ import javax.servlet.ServletException;
  * @author Phillip Webb
  * @see WebApplicationInitializer
  * @since 1.4.0
+ * @see org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext#selfInitialize(javax.servlet.ServletContext)
+ * @see ServletContextInitializerBeans#ServletContextInitializerBeans(org.springframework.beans.factory.ListableBeanFactory, Class[])
+ * 此接口的实现通过 ioc-bean 获取, 而不是如 {@link org.springframework.web.WebApplicationInitializer} 通过 servlet-3+ 容器加载
+ * @see RegistrationBean 注册 servlet/filter/listener
  */
 @FunctionalInterface
 public interface ServletContextInitializer {

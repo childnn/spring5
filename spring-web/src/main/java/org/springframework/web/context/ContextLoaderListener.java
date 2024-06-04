@@ -94,7 +94,7 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	 */
 	public ContextLoaderListener(WebApplicationContext context) {
 		super(context);
-		System.out.println(this + "--" + context);
+		System.out.println(this + "ContextLoaderListener--ContextLoaderListener" + context);
 	}
 
 

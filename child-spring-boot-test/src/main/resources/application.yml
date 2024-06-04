@@ -1,5 +1,6 @@
 logging:
   level:
+    org.springframework.web.servlet.FrameworkServlet: trace
     org.springframework.context.support.ApplicationObjectSupport: trace
     org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver: trace
     root: trace

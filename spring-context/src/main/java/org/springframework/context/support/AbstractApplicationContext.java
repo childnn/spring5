@@ -488,6 +488,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+	public static void main(String[] args) {
+		System.out.println(f());
+	}
+
+	static int f() {
+		try {
+			return 1;
+		} finally {
+			// return 2;
+			System.out.println("true = " + true);
+		}
+	}
+
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
@@ -529,6 +542,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// webapp: org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh -- 初始化 tomcat
 				onRefresh();
 
 				// Check for listener beans and register them.
@@ -591,7 +605,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// 如果是 spring 非 web 环境, environment 在 AnnotationConfigApplicationContext 的
 		// reader/scanner 初始化时调用 getOrCreateEnvironment 方法生成, 在此方法中, 满足条件
-		// 		// GenericApplicationContext implements BeanDefinitionRegistry, ApplicationContext extends EnvironmentCapable
+		// GenericApplicationContext implements BeanDefinitionRegistry, ApplicationContext extends EnvironmentCapable
 		//		if (registry instanceof EnvironmentCapable) {
 		// 			return ((EnvironmentCapable) registry).getEnvironment(); // 这里调用的就是当前类的 getEnvironment 方法
 		// 		}
@@ -822,6 +836,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>This implementation is empty.
 	 * @throws BeansException in case of errors
 	 * @see #refresh()
+	 * @see org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext#onRefresh()
 	 */
 	protected void onRefresh() throws BeansException {
 		// For subclasses: do nothing by default.

@@ -739,7 +739,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Override
 	protected boolean supportsInternal(HandlerMethod handlerMethod) {
 		Object bean = handlerMethod.getBean();
-		System.out.println("bean = " + bean);
+		System.out.println("RequestMappingHandlerAdapter-bean = " + bean);
 		return true;
 	}
 
